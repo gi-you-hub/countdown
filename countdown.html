@@ -3,157 +3,183 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>World Clock - Japan & Taipei</title>
-<style>
-  :root {
-    --bg: #191919; /* Notionのダークモード背景色に完全統合 */
-    --card-bg: rgba(255, 255, 255, 0.04);
-    --card-border: rgba(255, 255, 255, 0.08);
-    --jp-accent: #ff4757;
-    --tw-accent: #00d2d3;
-    --text-main: #ffffff;
-    --text-muted: #999999;
-  }
+  <title>World Clock Header</title>
+  <style>
+    :root {
+      --jp-accent: #ff4757;
+      --tw-accent: #00d2d3;
+      --text-main: #ffffff;
+      --text-sub: rgba(255, 255, 255, 0.7);
+    }
 
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
 
-  /* html と body 全体に背景色を強制適用 */
-  html, body {
-    width: 100%;
-    height: 100%;
-    background-color: var(--bg) !important;
-    overflow: hidden;
-  }
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #191919;
+    }
 
-  body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 8px;
-  }
+    /* ヘッダーコンテナ（背景画像＋オーバーレイ） */
+    .header-container {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      /* 高品質な都市の夜景写真（Unsplash） */
+      background-image: url('https://images.unsplash.com/photo-1503899036084-c55cdd92da26?auto=format&fit=crop&w=1200&q=80');
+      background-size: cover;
+      background-position: center 40%;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end; /* 下寄りに文字を配置（ヘッダー風） */
+      padding: 16px 20px;
+    }
 
-  /* Notionの枠に合わせて横幅いっぱいに広げる */
-  .clock-widget {
-    background: #22252a;
-    border: 1px solid var(--card-border);
-    border-radius: 12px;
-    padding: 10px 14px 8px 14px;
-    width: 100%;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-  }
+    /* 写真の上に黒グラデーションを重ねて文字を見やすくする */
+    .header-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.2) 0%,
+        rgba(0, 0, 0, 0.75) 100%
+      );
+      z-index: 1;
+    }
 
-  .clock-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-  }
+    .header-content {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+    }
 
-  .clock-card {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 8px;
-    padding: 6px 10px;
-    position: relative;
-    overflow: hidden;
-  }
+    .clock-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
 
-  .clock-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 3px;
-    height: 100%;
-  }
-  .card-jp::before { background: var(--jp-accent); }
-  .card-tw::before { background: var(--tw-accent); }
+    /* 各時計カード（ガラス風・背景すりガラス加工） */
+    .clock-card {
+      background: rgba(20, 20, 20, 0.45);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      padding: 8px 12px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    }
 
-  .card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2px;
-  }
+    .clock-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 3px;
+      height: 100%;
+    }
+    .card-jp::before { background: var(--jp-accent); }
+    .card-tw::before { background: var(--tw-accent); }
 
-  .city-name {
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 1px;
-  }
-  .card-jp .city-name { color: var(--jp-accent); }
-  .card-tw .city-name { color: var(--tw-accent); }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2px;
+    }
 
-  .date-display {
-    font-size: 0.65rem;
-    color: var(--text-muted);
-  }
+    .city-name {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    .card-jp .city-name { color: #ff6b81; }
+    .card-tw .city-name { color: #70a1ff; }
 
-  .time-display {
-    font-size: 1.4rem;
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
-    line-height: 1;
-    color: #ffffff;
-  }
+    .date-display {
+      font-size: 0.65rem;
+      color: var(--text-sub);
+    }
 
-  .seconds {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-  }
+    .time-display {
+      font-size: 1.5rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.1;
+      color: var(--text-main);
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    }
 
-  .time-diff {
-    margin-top: 6px;
-    padding-top: 4px;
-    font-size: 0.65rem;
-    color: var(--text-muted);
-    text-align: center;
-    border-top: 1px dashed rgba(255, 255, 255, 0.1);
-  }
+    .seconds {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-sub);
+    }
 
-  .time-diff span {
-    color: var(--tw-accent);
-    font-weight: 600;
-  }
-</style>
+    .time-diff {
+      margin-top: 8px;
+      font-size: 0.65rem;
+      color: var(--text-sub);
+      text-align: center;
+      letter-spacing: 0.5px;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+    }
+
+    .time-diff span {
+      color: var(--tw-accent);
+      font-weight: 600;
+    }
+
+    @media (max-width: 420px) {
+      .time-display { font-size: 1.25rem; }
+      .header-container { padding: 12px; }
+      .clock-grid { gap: 8px; }
+    }
+  </style>
 </head>
 <body>
 
-  <div class="clock-widget">
-    <div class="clock-grid">
-      <!-- Japan Clock -->
-      <div class="clock-card card-jp">
-        <div class="card-header">
-          <span class="city-name">🇯🇵 TOKYO</span>
-          <span class="date-display" id="jp-date">--/-- (--)</span>
-        </div>
-        <div class="time-wrapper">
+  <div class="header-container">
+    <div class="header-content">
+      <div class="clock-grid">
+        <!-- Japan Clock -->
+        <div class="clock-card card-jp">
+          <div class="card-header">
+            <span class="city-name">🇯🇵 TOKYO</span>
+            <span class="date-display" id="jp-date">--/-- (--)</span>
+          </div>
           <div class="time-display">
             <span id="jp-time">00:00</span><span class="seconds" id="jp-sec">:00</span>
           </div>
         </div>
-      </div>
 
-      <!-- Taipei Clock -->
-      <div class="clock-card card-tw">
-        <div class="card-header">
-          <span class="city-name">🇹🇼 TAIPEI</span>
-          <span class="date-display" id="tw-date">--/-- (--)</span>
-        </div>
-        <div class="time-wrapper">
+        <!-- Taipei Clock -->
+        <div class="clock-card card-tw">
+          <div class="card-header">
+            <span class="city-name">🇹🇼 TAIPEI</span>
+            <span class="date-display" id="tw-date">--/-- (--)</span>
+          </div>
           <div class="time-display">
             <span id="tw-time">00:00</span><span class="seconds" id="tw-sec">:00</span>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="time-diff">
-      時差: 台北は日本より <span>1時間遅い</span> です
+      <div class="time-diff">
+        時差：台北は日本より <span>1時間遅い</span> です
+      </div>
     </div>
   </div>
 
@@ -163,7 +189,7 @@
     function updateClocks() {
       const now = new Date();
 
-      // Japan Time (UTC+9)
+      // Japan Time
       const jpFormatter = new Intl.DateTimeFormat('ja-JP', {
         timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit',
         hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
@@ -175,7 +201,7 @@
       document.getElementById('jp-sec').innerText = `:${jpParts.second}`;
       document.getElementById('jp-date').innerText = `${jpParts.month}/${jpParts.day} (${daysJP[jpDateObj.getDay()]})`;
 
-      // Taipei Time (UTC+8)
+      // Taipei Time
       const twFormatter = new Intl.DateTimeFormat('ja-JP', {
         timeZone: 'Asia/Taipei', year: 'numeric', month: '2-digit', day: '2-digit',
         hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
