@@ -4,144 +4,122 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>World Clock - Japan & Taipei</title>
-  <style>
-    :root {
-      --bg: #0f1115;
-      --card-bg: rgba(255, 255, 255, 0.03);
-      --card-border: rgba(255, 255, 255, 0.08);
-      --jp-accent: #ff4757;
-      --tw-accent: #00d2d3;
-      --text-main: #f1f2f6;
-      --text-sub: #8c7ae6;
-      --text-muted: #718093;
-    }
+<style>
+  :root {
+    --bg: #191919; /* Notionのダークモード背景色に完全統合 */
+    --card-bg: rgba(255, 255, 255, 0.04);
+    --card-border: rgba(255, 255, 255, 0.08);
+    --jp-accent: #ff4757;
+    --tw-accent: #00d2d3;
+    --text-main: #ffffff;
+    --text-muted: #999999;
+  }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
-    }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
 
-    body {
-  background-color: transparent; /* 背景を透明にして余白を目立たなくする */
-  color: var(--text-main);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  padding: 0; /* 余計なパディングを排除 */
-  margin: 0;
-}
+  /* html と body 全体に背景色を強制適用 */
+  html, body {
+    width: 100%;
+    height: 100%;
+    background-color: var(--bg) !important;
+    overflow: hidden;
+  }
 
-.clock-widget {
-  background: rgba(22, 25, 35, 0.95);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 14px;
-  padding: 10px 14px 8px 14px;
-  width: 100%;
-  /* max-width: 520px; ← ここを削除または調整 */
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
-}
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 8px;
+  }
 
-    .clock-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
-    }
+  /* Notionの枠に合わせて横幅いっぱいに広げる */
+  .clock-widget {
+    background: #22252a;
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 10px 14px 8px 14px;
+    width: 100%;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
 
-    /* 各時計カード：横並びレイアウトで省スペース化 */
-    .clock-card {
-      background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 10px;
-      padding: 6px 10px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-    }
+  .clock-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
 
-    .clock-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 3px;
-      height: 100%;
-    }
-    .card-jp::before { background: var(--jp-accent); }
-    .card-tw::before { background: var(--tw-accent); }
+  .clock-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    padding: 6px 10px;
+    position: relative;
+    overflow: hidden;
+  }
 
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2px;
-    }
+  .clock-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 3px;
+    height: 100%;
+  }
+  .card-jp::before { background: var(--jp-accent); }
+  .card-tw::before { background: var(--tw-accent); }
 
-    .city-name {
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 1px;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-    }
-    .card-jp .city-name { color: var(--jp-accent); }
-    .card-tw .city-name { color: var(--tw-accent); }
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2px;
+  }
 
-    .date-display {
-      font-size: 0.65rem;
-      color: var(--text-muted);
-      font-weight: 500;
-    }
+  .city-name {
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+  .card-jp .city-name { color: var(--jp-accent); }
+  .card-tw .city-name { color: var(--tw-accent); }
 
-    .time-wrapper {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-    }
+  .date-display {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+  }
 
-    .time-display {
-      font-size: 1.45rem;
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
-      letter-spacing: -0.5px;
-      line-height: 1;
-      color: #ffffff;
-    }
+  .time-display {
+    font-size: 1.4rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    color: #ffffff;
+  }
 
-    .seconds {
-      font-size: 0.8rem;
-      font-weight: 500;
-      color: var(--text-muted);
-      margin-left: 1px;
-    }
+  .seconds {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
 
-    /* 時差インフォメーション：1行にスッキリ統合 */
-    .time-diff {
-      margin-top: 6px;
-      padding-top: 4px;
-      font-size: 0.65rem;
-      color: var(--text-muted);
-      text-align: center;
-      border-top: 1px dashed rgba(255, 255, 255, 0.06);
-    }
+  .time-diff {
+    margin-top: 6px;
+    padding-top: 4px;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    text-align: center;
+    border-top: 1px dashed rgba(255, 255, 255, 0.1);
+  }
 
-    .time-diff span {
-      color: var(--tw-accent);
-      font-weight: 600;
-    }
-
-    @media (max-width: 400px) {
-      .time-display { font-size: 1.25rem; }
-      .seconds { font-size: 0.75rem; }
-      .clock-widget { padding: 8px; }
-    }
-  </style>
+  .time-diff span {
+    color: var(--tw-accent);
+    font-weight: 600;
+  }
+</style>
 </head>
 <body>
 
