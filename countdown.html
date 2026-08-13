@@ -3,328 +3,398 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>World Clock & Countdown Header</title>
+  <title>Travel Dashboard Header</title>
+  <!-- Chart.js 読み込み（1週間レートグラフ用） -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     :root {
       --jp-accent: #ff4757;
       --tw-accent: #00d2d3;
       --cd-accent: #ffa502;
       --text-main: #ffffff;
-      --text-sub: rgba(255, 255, 255, 0.75);
+      --text-sub: rgba(255, 255, 255, 0.7);
+      --card-bg: rgba(20, 24, 33, 0.55);
+      --card-border: rgba(255, 255, 255, 0.12);
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
     html, body {
       width: 100%;
       height: 100%;
-      overflow: hidden;
+      overflow-x: hidden;
       background-color: #191919;
     }
 
-    /* ヘッダー全体コンテナ */
-    .header-container {
+    /* 背景画像＋暗めオーバーレイ */
+    .dashboard-container {
       position: relative;
       width: 100%;
-      height: 100vh;
-      background-image: url('https://itta.me/assets/img/article/10295/01.jpg');
+      min-height: 100vh;
+      background-image: url('https://www.every-photo.com/clients/img/spacer.gif');
       background-size: cover;
       background-position: center;
-      background-color: #0f1117; /* 画像読み込み時や透明画像時のグラデーション下地 */
+      background-color: #0f1117;
+      padding: 20px;
       display: flex;
       flex-direction: column;
-      justify-content: flex-end;
-      padding: 16px 20px;
+      justify-content: space-between;
     }
 
-    /* オーバーレイ：暗めの背景グラデーション */
-    .header-container::before {
+    .dashboard-container::before {
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: radial-gradient(circle at top right, rgba(0,210,211,0.15), transparent 40%),
-                  linear-gradient(to bottom, rgba(15, 17, 23, 0.3) 0%, rgba(15, 17, 23, 0.95) 100%);
+      background: linear-gradient(to bottom, rgba(15,17,23,0.3) 0%, rgba(15,17,23,0.92) 100%);
       z-index: 1;
     }
 
-    .header-content {
+    /* ガラスカード共通CSS */
+    .glass-card {
       position: relative;
       z-index: 2;
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 10px 14px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
     }
 
-    /* 上段：時計グリッド */
-    .clock-grid {
+    .card-title {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: var(--text-sub);
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* 右上：カウントダウンタイマー（日のみ） */
+    .top-right-section {
+      display: flex;
+      justify-content: flex-end;
+      position: relative;
+      z-index: 2;
+      margin-bottom: 20px;
+    }
+
+    .countdown-card {
+      text-align: center;
+      border-left: 3px solid var(--cd-accent);
+      min-width: 150px;
+    }
+
+    .countdown-val {
+      font-size: 2.2rem;
+      font-weight: 900;
+      color: var(--cd-accent);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .countdown-unit {
+      font-size: 0.65rem;
+      color: var(--text-sub);
+      letter-spacing: 1px;
+    }
+
+    /* 下部コンテンツグリッド（左右2カラム構造） */
+    .bottom-grid {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .column {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    /* 左上：時間表示 */
+    .time-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .time-card-jp { border-left: 3px solid var(--jp-accent); }
+    .time-card-tw { border-left: 3px solid var(--tw-accent); }
+
+    .city-label-jp { color: #ff6b81 !important; }
+    .city-label-tw { color: #70a1ff !important; }
+
+    .time-num {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--text-main);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .time-sec {
+      font-size: 0.75rem;
+      color: var(--text-sub);
+    }
+
+    /* 左下：3日間天気・気温 */
+    .weather-container {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
     }
 
-    /* カード共通スタイル（すりガラス調） */
-    .glass-card {
-      background: rgba(255, 255, 255, 0.05);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 12px;
-      padding: 8px 12px;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+    .weather-city-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      margin-bottom: 6px;
     }
 
-    .glass-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0;
-      width: 3px; height: 100%;
-    }
-    .card-jp::before { background: var(--jp-accent); }
-    .card-tw::before { background: var(--tw-accent); }
-    .card-cd::before { background: var(--cd-accent); }
-
-    .card-header {
+    .weather-forecast {
       display: flex;
       justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2px;
+      gap: 4px;
     }
 
-    .label {
-      font-size: 0.68rem;
-      font-weight: 700;
-      letter-spacing: 1px;
-    }
-    .card-jp .label { color: #ff6b81; }
-    .card-tw .label { color: #70a1ff; }
-    .card-cd .label { color: var(--cd-accent); }
-
-    .date-display {
-      font-size: 0.65rem;
-      color: var(--text-sub);
-    }
-
-    .time-display {
-      font-size: 1.4rem;
-      font-weight: 800;
-      font-variant-numeric: tabular-nums;
-      line-height: 1.1;
-      color: var(--text-main);
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-    }
-
-    .seconds {
-      font-size: 0.8rem;
-      font-weight: 500;
-      color: var(--text-sub);
-    }
-
-    /* 下段：カウントダウンタイマー */
-    .countdown-card {
-      padding: 8px 14px;
-    }
-
-    .cd-grid {
-      display: flex;
-      justify-content: space-around;
-      align-items: center;
-      margin-top: 4px;
+    .weather-day {
       text-align: center;
+      flex: 1;
+      background: rgba(255,255,255,0.03);
+      padding: 4px 2px;
+      border-radius: 6px;
     }
 
-    .cd-item {
+    .weather-date { font-size: 0.58rem; color: var(--text-sub); }
+    .weather-icon { font-size: 0.9rem; margin: 2px 0; }
+    .weather-temp { font-size: 0.62rem; font-weight: 600; color: var(--text-main); }
+
+    /* 右上：為替レート1週間折れ線グラフ */
+    .chart-container {
+      height: 110px;
+      position: relative;
+    }
+
+    /* 右下：為替レート表示 */
+    .rate-display {
       display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .cd-value {
-      font-size: 1.35rem;
-      font-weight: 800;
-      font-variant-numeric: tabular-nums;
-      color: var(--text-main);
-      line-height: 1;
-    }
-
-    .cd-unit {
-      font-size: 0.58rem;
-      color: var(--text-sub);
-      margin-top: 2px;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .cd-colon {
-      font-size: 1rem;
-      font-weight: 700;
-      color: var(--cd-accent);
-      margin-bottom: 8px;
-    }
-
-    .footer-bar {
-      display: flex;
+      align-items: baseline;
       justify-content: space-between;
-      align-items: center;
-      font-size: 0.62rem;
-      color: var(--text-sub);
-      padding: 0 4px;
     }
 
-    .time-diff span {
+    .rate-main {
+      font-size: 1.5rem;
+      font-weight: 800;
       color: var(--tw-accent);
-      font-weight: 600;
+      font-variant-numeric: tabular-nums;
     }
 
-    @media (max-width: 420px) {
-      .time-display { font-size: 1.2rem; }
-      .cd-value { font-size: 1.1rem; }
-      .header-container { padding: 10px; }
+    .rate-sub {
+      font-size: 0.75rem;
+      color: var(--text-sub);
+    }
+
+    /* レスポンシブ対応 */
+    @media (max-width: 500px) {
+      .bottom-grid {
+        grid-template-columns: 1fr;
+      }
+      .time-num { font-size: 1.1rem; }
     }
   </style>
 </head>
 <body>
 
-  <div class="header-container">
-    <div class="header-content">
-      
-      <!-- 世界時計エリア -->
-      <div class="clock-grid">
-        <!-- Japan Clock -->
-        <div class="glass-card card-jp">
-          <div class="card-header">
-            <span class="label">🇯🇵 TOKYO</span>
-            <span class="date-display" id="jp-date">--/-- (--)</span>
+  <div class="dashboard-container">
+
+    <!-- 右上：カウントダウンタイマー（日のみ） -->
+    <div class="top-right-section">
+      <div class="glass-card countdown-card">
+        <div class="card-title">COUNTDOWN</div>
+        <div class="countdown-val" id="cd-days">--</div>
+        <div class="countdown-unit">DAYS LEFT</div>
+      </div>
+    </div>
+
+    <!-- 下部：2列グリッドエリア -->
+    <div class="bottom-grid">
+
+      <!-- 左カラム（時間 ＆ 天気） -->
+      <div class="column">
+        
+        <!-- 左上：日本時間と台北時間の表示 -->
+        <div class="time-grid">
+          <div class="glass-card time-card-jp">
+            <div class="card-title city-label-jp">🇯🇵 TOKYO</div>
+            <div class="time-num">
+              <span id="jp-time">00:00</span><span class="time-sec" id="jp-sec">:00</span>
+            </div>
           </div>
-          <div class="time-display">
-            <span id="jp-time">00:00</span><span class="seconds" id="jp-sec">:00</span>
+          <div class="glass-card time-card-tw">
+            <div class="card-title city-label-tw">🇹🇼 TAIPEI</div>
+            <div class="time-num">
+              <span id="tw-time">00:00</span><span class="time-sec" id="tw-sec">:00</span>
+            </div>
           </div>
         </div>
 
-        <!-- Taipei Clock -->
-        <div class="glass-card card-tw">
-          <div class="card-header">
-            <span class="label">🇹🇼 TAIPEI</span>
-            <span class="date-display" id="tw-date">--/-- (--)</span>
-          </div>
-          <div class="time-display">
-            <span id="tw-time">00:00</span><span class="seconds" id="tw-sec">:00</span>
+        <!-- 左下：日本と台北の3日間天気・気温 -->
+        <div class="glass-card">
+          <div class="card-title">3-DAY WEATHER FORECAST</div>
+          <div class="weather-container">
+            <!-- 東京の天気 -->
+            <div>
+              <div class="weather-city-title city-label-jp">Tokyo</div>
+              <div class="weather-forecast" id="jp-weather">
+                <div class="weather-day"><div class="weather-date">今日</div><div class="weather-icon">☀️</div><div class="weather-temp">28°</div></div>
+                <div class="weather-day"><div class="weather-date">明日</div><div class="weather-icon">⛅</div><div class="weather-temp">27°</div></div>
+                <div class="weather-day"><div class="weather-date">明後日</div><div class="weather-icon">☁️</div><div class="weather-temp">25°</div></div>
+              </div>
+            </div>
+            <!-- 台北の天気 -->
+            <div>
+              <div class="weather-city-title city-label-tw">Taipei</div>
+              <div class="weather-forecast" id="tw-weather">
+                <div class="weather-day"><div class="weather-date">今日</div><div class="weather-icon">🌤️</div><div class="weather-temp">31°</div></div>
+                <div class="weather-day"><div class="weather-date">明日</div><div class="weather-icon">🌧️</div><div class="weather-temp">29°</div></div>
+                <div class="weather-day"><div class="weather-date">明後日</div><div class="weather-icon">☀️</div><div class="weather-temp">32°</div></div>
+              </div>
+            </div>
           </div>
         </div>
+
       </div>
 
-      <!-- カウントダウンタイマーエリア -->
-      <div class="glass-card card-cd countdown-card">
-        <div class="card-header">
-          <span class="label">⏳ COUNTDOWN</span>
-          <span class="date-display">Target: 11/30 11:45</span>
-        </div>
-        <div class="cd-grid">
-          <div class="cd-item">
-            <span class="cd-value" id="cd-days">00</span>
-            <span class="cd-unit">Days</span>
-          </div>
-          <span class="cd-colon">:</span>
-          <div class="cd-item">
-            <span class="cd-value" id="cd-hours">00</span>
-            <span class="cd-unit">Hours</span>
-          </div>
-          <span class="cd-colon">:</span>
-          <div class="cd-item">
-            <span class="cd-value" id="cd-mins">00</span>
-            <span class="cd-unit">Mins</span>
-          </div>
-          <span class="cd-colon">:</span>
-          <div class="cd-item">
-            <span class="cd-value" id="cd-secs">00</span>
-            <span class="cd-unit">Secs</span>
+      <!-- 右カラム（グラフ ＆ レート） -->
+      <div class="column">
+        
+        <!-- 右上：台湾ドル 日本円 レート 1週間折れ線グラフ -->
+        <div class="glass-card">
+          <div class="card-title">TWD / JPY (PAST 7 DAYS)</div>
+          <div class="chart-container">
+            <canvas id="rateChart"></canvas>
           </div>
         </div>
-      </div>
 
-      <!-- 下部フッター情報 -->
-      <div class="footer-bar">
-        <div class="time-diff">時差: 台北は日本より <span>1時間遅い</span> です</div>
+        <!-- 右下：台湾ドル 日本円 レート表示 -->
+        <div class="glass-card">
+          <div class="card-title">EXCHANGE RATE</div>
+          <div class="rate-display">
+            <div>
+              <span class="rate-sub">1 TWD = </span>
+              <span class="rate-main" id="twd-jpy-rate">4.85</span>
+              <span class="rate-sub"> JPY</span>
+            </div>
+            <span class="rate-sub" style="font-size: 0.6rem; color: #00d2d3;">Live Rate</span>
+          </div>
+        </div>
+
       </div>
 
     </div>
+
   </div>
 
   <script>
-    const daysJP = ['日', '月', '火', '水', '木', '金', '土'];
-
-    // カウントダウン目標日時の計算（毎年11月30日 11:45:00 JST）
-    function getTargetDate() {
+    // 1. カウントダウン（11月30日までの日数のみ計算）
+    function updateCountdown() {
       const now = new Date();
       let targetYear = now.getFullYear();
-      let target = new Date(targetYear, 10, 30, 11, 45, 0); // 月は0始まり（10 = 11月）
-      
-      // 今年の11月30日11:45を過ぎていたら翌年に設定
+      let target = new Date(targetYear, 10, 30, 11, 45, 0); // 11/30
       if (now > target) {
         target = new Date(targetYear + 1, 10, 30, 11, 45, 0);
       }
-      return target;
+      const diff = target - now;
+      const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+      document.getElementById('cd-days').innerText = days;
     }
 
-    const targetDate = getTargetDate();
-
-    function updateDashboard() {
+    // 2. 時計更新（東京 ＆ 台北）
+    function updateClocks() {
       const now = new Date();
+      
+      const jpFmt = new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+      const jpP = Object.fromEntries(jpFmt.formatToParts(now).map(p => [p.type, p.value]));
+      document.getElementById('jp-time').innerText = `${jpP.hour}:${jpP.minute}`;
+      document.getElementById('jp-sec').innerText = `:${jpP.second}`;
 
-      // 1. 日本時間 (UTC+9)
-      const jpFormatter = new Intl.DateTimeFormat('ja-JP', {
-        timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit',
-        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+      const twFmt = new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Taipei', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+      const twP = Object.fromEntries(twFmt.formatToParts(now).map(p => [p.type, p.value]));
+      document.getElementById('tw-time').innerText = `${twP.hour}:${twP.minute}`;
+      document.getElementById('tw-sec').innerText = `:${twP.second}`;
+    }
+
+    // 3. 折れ線グラフ描画 (Chart.js)
+    function initChart() {
+      const ctx = document.getElementById('rateChart').getContext('2d');
+      
+      // ダミーの過去7日間データ（後からリアルタイムAPI連動も可能）
+      const labels = ['7日前', '6日前', '5日前', '4日前', '3日前', '2日前', '今日'];
+      const dataPoints = [4.81, 4.83, 4.82, 4.86, 4.84, 4.85, 4.87];
+
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [{
+            data: dataPoints,
+            borderColor: '#00d2d3',
+            backgroundColor: 'rgba(0, 210, 211, 0.15)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.3,
+            pointRadius: 2,
+            pointHoverRadius: 4
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: {
+              ticks: { color: 'rgba(255,255,255,0.5)', font: { size: 9 } },
+              grid: { display: false }
+            },
+            y: {
+              ticks: { color: 'rgba(255,255,255,0.5)', font: { size: 9 } },
+              grid: { color: 'rgba(255,255,255,0.05)' }
+            }
+          }
+        }
       });
-      const jpParts = Object.fromEntries(jpFormatter.formatToParts(now).map(p => [p.type, p.value]));
-      const jpDateObj = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Tokyo' }));
+    }
 
-      document.getElementById('jp-time').innerText = `${jpParts.hour}:${jpParts.minute}`;
-      document.getElementById('jp-sec').innerText = `:${jpParts.second}`;
-      document.getElementById('jp-date').innerText = `${jpParts.month}/${jpParts.day} (${daysJP[jpDateObj.getDay()]})`;
-
-      // 2. 台北時間 (UTC+8)
-      const twFormatter = new Intl.DateTimeFormat('ja-JP', {
-        timeZone: 'Asia/Taipei', year: 'numeric', month: '2-digit', day: '2-digit',
-        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
-      });
-      const twParts = Object.fromEntries(twFormatter.formatToParts(now).map(p => [p.type, p.value]));
-      const twDateObj = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
-
-      document.getElementById('tw-time').innerText = `${twParts.hour}:${twParts.minute}`;
-      document.getElementById('tw-sec').innerText = `:${twParts.second}`;
-      document.getElementById('tw-date').innerText = `${twParts.month}/${twParts.day} (${daysJP[twDateObj.getDay()]})`;
-
-      // 3. カウントダウン計算
-      const diff = targetDate - now;
-
-      if (diff <= 0) {
-        document.getElementById('cd-days').innerText = '00';
-        document.getElementById('cd-hours').innerText = '00';
-        document.getElementById('cd-mins').innerText = '00';
-        document.getElementById('cd-secs').innerText = '00';
-      } else {
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-        const mins = Math.floor((diff / (1000 * 60)) % 60);
-        const secs = Math.floor((diff / 1000) % 60);
-
-        document.getElementById('cd-days').innerText = String(days).padStart(2, '0');
-        document.getElementById('cd-hours').innerText = String(hours).padStart(2, '0');
-        document.getElementById('cd-mins').innerText = String(mins).padStart(2, '0');
-        document.getElementById('cd-secs').innerText = String(secs).padStart(2, '0');
+    // 無料APIによる最新為替レート取得（自動取得失敗時はデフォルト4.85を表示）
+    async function fetchExchangeRate() {
+      try {
+        const res = await fetch('https://open.er-api.com/v6/latest/TWD');
+        const data = await res.json();
+        if (data && data.rates && data.rates.JPY) {
+          const rate = data.rates.JPY.toFixed(2);
+          document.getElementById('twd-jpy-rate').innerText = rate;
+        }
+      } catch (e) {
+        console.log('為替レートAPI取得スキップ（フォールバック表示）');
       }
     }
 
-    updateDashboard();
-    setInterval(updateDashboard, 1000);
+    // 初期化実行
+    updateCountdown();
+    updateClocks();
+    initChart();
+    fetchExchangeRate();
+
+    setInterval(updateClocks, 1000);
   </script>
 </body>
 </html>
