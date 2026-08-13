@@ -24,26 +24,26 @@
     }
 
     body {
-      background-color: var(--bg);
-      color: var(--text-main);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
-      padding: 12px;
-    }
+  background-color: transparent; /* 背景を透明にして余白を目立たなくする */
+  color: var(--text-main);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 0; /* 余計なパディングを排除 */
+  margin: 0;
+}
 
-    /* 全体コンテナ：高さを低く横長に */
-    .clock-widget {
-      background: rgba(22, 25, 35, 0.75);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 14px;
-      padding: 10px 14px 8px 14px;
-      width: 100%;
-      max-width: 520px;
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    }
+.clock-widget {
+  background: rgba(22, 25, 35, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 14px;
+  padding: 10px 14px 8px 14px;
+  width: 100%;
+  /* max-width: 520px; ← ここを削除または調整 */
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
 
     .clock-grid {
       display: grid;
