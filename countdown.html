@@ -3,211 +3,200 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HUD Cockpit Dashboard - Komatsu & Taipei</title>
+  <title>HUD Cockpit Dashboard - Ultra Compact</title>
   <style>
     :root {
       --hud-cyan: #00f3ff;
       --hud-magenta: #ff0055;
       --hud-amber: #ffb700;
-      --hud-blue: #00a8ff;
       --text-main: #ffffff;
-      --text-sub: rgba(220, 245, 255, 0.8);
-      /* ガラスカードの透過度を大幅にアップ */
-      --card-bg: rgba(6, 12, 24, 0.45);
-      --card-border: rgba(0, 243, 255, 0.35);
+      --text-sub: rgba(255, 255, 255, 0.85);
+      /* カード背景をほぼ完全透明化（写真がくっきり透ける） */
+      --card-bg: rgba(5, 10, 20, 0.25);
+      --card-border: rgba(0, 243, 255, 0.4);
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Consolas, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
     }
 
     html, body {
       width: 100%;
       height: 100%;
-      overflow-x: hidden;
-      background-color: #050811;
+      overflow: hidden;
+      background-color: #000;
     }
 
-    /* 背景画像：オーバーレイを薄くして写真をクリアに見せる */
+    /* 背景画像：オーバーレイを極限まで薄く */
     .dashboard-container {
       position: relative;
       width: 100%;
-      min-height: 100vh;
+      height: 100vh;
       background-image: url('https://www.travel.taipei/image/339510/?r=1673063414149');
       background-size: cover;
       background-position: center;
-      padding: 18px;
+      padding: 10px 14px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
     }
 
-    /* コックピットの周辺光＆極薄ビネット処理 */
+    /* 周辺の黒みを最小限に抑える */
     .dashboard-container::before {
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: 
-        radial-gradient(circle at center, rgba(0, 243, 255, 0.03) 0%, rgba(5, 8, 17, 0.55) 100%),
-        linear-gradient(to bottom, rgba(5,8,17,0.2) 0%, rgba(5,8,17,0.65) 100%);
+      background: radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.4) 100%);
       z-index: 1;
       pointer-events: none;
     }
 
-    /* 近未来HUDパネル（すりガラス＋ネオン発光） */
+    /* 限界まで透過させたネオンカード */
     .hud-card {
       position: relative;
       z-index: 2;
       background: var(--card-bg);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
       border: 1px solid var(--card-border);
-      border-radius: 8px;
-      padding: 10px 14px;
-      box-shadow: 
-        0 0 15px rgba(0, 243, 255, 0.12),
-        inset 0 0 15px rgba(0, 243, 255, 0.05);
+      border-radius: 6px;
+      padding: 6px 10px;
+      box-shadow: 0 0 10px rgba(0, 243, 255, 0.15);
     }
 
-    /* コックピット風の四隅コーナーノッチ（装飾） */
+    /* 四隅の近未来ノッチ */
     .hud-card::after {
       content: '';
       position: absolute;
       bottom: -1px; right: -1px;
-      width: 8px; height: 8px;
+      width: 6px; height: 6px;
       border-right: 2px solid var(--hud-cyan);
       border-bottom: 2px solid var(--hud-cyan);
     }
 
     .card-title {
-      font-size: 0.62rem;
+      font-size: 0.6rem;
       font-weight: 800;
-      letter-spacing: 1.5px;
+      letter-spacing: 1px;
       color: var(--hud-cyan);
-      margin-bottom: 6px;
+      margin-bottom: 3px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      text-transform: uppercase;
-      text-shadow: 0 0 8px rgba(0, 243, 255, 0.6);
+      text-shadow: 0 0 6px rgba(0, 243, 255, 0.8), 0 1px 3px rgba(0,0,0,0.9);
     }
 
-    /* 右上：カウントダウン（アンバー発光） */
+    /* 右上：カウントダウン */
     .top-right-section {
       display: flex;
       justify-content: flex-end;
       position: relative;
       z-index: 2;
-      margin-bottom: 16px;
+      margin-bottom: 6px;
     }
 
     .countdown-card {
       text-align: center;
       border-color: rgba(255, 183, 0, 0.5);
-      box-shadow: 0 0 15px rgba(255, 183, 0, 0.15), inset 0 0 10px rgba(255, 183, 0, 0.05);
-      min-width: 145px;
+      min-width: 120px;
+      padding: 4px 8px;
     }
     .countdown-card::after { border-color: var(--hud-amber); }
 
     .countdown-card .card-title {
       color: var(--hud-amber);
-      text-shadow: 0 0 8px rgba(255, 183, 0, 0.6);
+      text-shadow: 0 0 6px rgba(255, 183, 0, 0.8), 0 1px 3px rgba(0,0,0,0.9);
     }
 
     .countdown-val {
-      font-size: 2.3rem;
+      font-size: 1.8rem;
       font-weight: 900;
       color: var(--hud-amber);
       line-height: 1;
       font-variant-numeric: tabular-nums;
-      text-shadow: 0 0 12px rgba(255, 183, 0, 0.8), 0 2px 4px rgba(0,0,0,0.9);
+      text-shadow: 0 0 10px rgba(255, 183, 0, 0.9), 0 2px 4px rgba(0,0,0,0.9);
     }
 
     .countdown-unit {
-      font-size: 0.6rem;
+      font-size: 0.55rem;
       color: var(--text-sub);
-      letter-spacing: 1.5px;
+      letter-spacing: 1px;
       font-weight: 700;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.9);
     }
 
-    /* 下部グリッド */
+    /* 下部：2カラムグリッド */
     .bottom-grid {
       position: relative;
       z-index: 2;
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 12px;
+      gap: 8px;
       align-items: end;
     }
 
-    /* 時計表示 */
+    /* 時計 */
     .time-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
+      gap: 6px;
     }
 
-    .time-card-jp {
-      border-color: rgba(255, 0, 85, 0.4);
-      box-shadow: 0 0 12px rgba(255, 0, 85, 0.12);
-    }
+    .time-card-jp { border-color: rgba(255, 0, 85, 0.5); }
     .time-card-jp::after { border-color: var(--hud-magenta); }
-    .city-label-jp { color: var(--hud-magenta) !important; text-shadow: 0 0 8px rgba(255, 0, 85, 0.6) !important; }
-
-    .time-card-tw {
-      border-color: rgba(0, 243, 255, 0.4);
-    }
+    .city-label-jp { color: var(--hud-magenta) !important; text-shadow: 0 0 6px rgba(255, 0, 85, 0.8), 0 1px 3px rgba(0,0,0,0.9) !important; }
 
     .time-num {
-      font-size: 1.4rem;
+      font-size: 1.25rem;
       font-weight: 800;
       color: #ffffff;
       font-variant-numeric: tabular-nums;
-      text-shadow: 0 0 10px rgba(255, 255, 255, 0.6), 0 2px 4px rgba(0, 0, 0, 0.9);
+      line-height: 1;
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.8), 0 2px 4px rgba(0, 0, 0, 0.9);
     }
 
     .time-sec {
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       color: var(--hud-cyan);
       font-weight: 600;
     }
 
-    /* 天気表示 */
+    /* 天気 */
     .weather-container {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 8px;
+      gap: 6px;
     }
 
     .weather-city-title {
-      font-size: 0.65rem;
+      font-size: 0.60rem;
       font-weight: 800;
-      margin-bottom: 4px;
-      letter-spacing: 0.5px;
+      margin-bottom: 2px;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.9);
     }
 
     .weather-forecast {
       display: flex;
       justify-content: space-between;
-      gap: 4px;
+      gap: 2px;
     }
 
     .weather-day {
       text-align: center;
       flex: 1;
-      background: rgba(0, 243, 255, 0.05);
-      border: 1px solid rgba(0, 243, 255, 0.15);
-      padding: 5px 2px;
+      background: rgba(0, 243, 255, 0.08);
+      border: 1px solid rgba(0, 243, 255, 0.2);
+      padding: 3px 1px;
       border-radius: 4px;
     }
 
-    .weather-date { font-size: 0.58rem; color: var(--text-sub); font-weight: 600; }
-    .weather-icon { font-size: 1.1rem; margin: 2px 0; filter: drop-shadow(0 0 4px rgba(255,255,255,0.4)); }
+    .weather-date { font-size: 0.55rem; color: var(--text-sub); font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.9); }
+    .weather-icon { font-size: 0.95rem; margin: 1px 0; filter: drop-shadow(0 0 4px rgba(0,0,0,0.9)); }
     .weather-temp {
-      font-size: 0.68rem;
+      font-size: 0.62rem;
       font-weight: 800;
       color: #ffffff;
       text-shadow: 0 1px 3px rgba(0,0,0,0.9);
@@ -215,7 +204,7 @@
 
     @media (max-width: 520px) {
       .bottom-grid { grid-template-columns: 1fr; }
-      .time-num { font-size: 1.15rem; }
+      .time-num { font-size: 1.1rem; }
     }
   </style>
 </head>
@@ -226,9 +215,9 @@
     <!-- カウントダウン -->
     <div class="top-right-section">
       <div class="hud-card countdown-card">
-        <div class="card-title">▶ T-MINUS</div>
+        <div class="card-title">COUNTDOWN</div>
         <div class="countdown-val" id="cd-days">--</div>
-        <div class="countdown-unit">DAYS TO LAUNCH</div>
+        <div class="countdown-unit">DAYS LEFT</div>
       </div>
     </div>
 
@@ -251,13 +240,12 @@
         </div>
       </div>
 
-      <!-- 3日間天気（気象庁JMA・台北） -->
+      <!-- 3日間天気（小松・台北） -->
       <div class="hud-card">
-        <div class="card-title">SYS // METEO FORECAST</div>
         <div class="weather-container">
           <!-- 小松 -->
           <div>
-            <div class="weather-city-title city-label-jp">KOMATSU (JMA)</div>
+            <div class="weather-city-title city-label-jp">KOMATSU</div>
             <div class="weather-forecast" id="km-weather">
               <div class="weather-day"><div class="weather-date">今日</div><div class="weather-icon">--</div><div class="weather-temp">--°</div></div>
               <div class="weather-day"><div class="weather-date">明日</div><div class="weather-icon">--</div><div class="weather-temp">--°</div></div>
@@ -319,7 +307,7 @@
       return '🌤️';
     }
 
-    // 天気取得（小松市は気象庁JMA MSMモデル）
+    // 天気取得（小松市は気象庁JMA MSMモデルを指定）
     async function fetchWeatherData() {
       const kmUrl = 'https://api.open-meteo.com/v1/forecast?latitude=36.4026&longitude=136.4507&daily=weathercode,temperature_2m_max&timezone=Asia%2FTokyo&models=jma_msm';
       const twUrl = 'https://api.open-meteo.com/v1/forecast?latitude=25.0330&longitude=121.5654&daily=weathercode,temperature_2m_max&timezone=Asia%2FTaipei';
