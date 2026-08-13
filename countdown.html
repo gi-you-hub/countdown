@@ -3,170 +3,215 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Taiwan Trip Countdown</title>
+  <title>World Clock - Japan & Taipei</title>
   <style>
     :root {
-      --bg-color: #191919;
-      --card-bg: #252525;
-      --accent-gradient: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
-      --text-main: #ffffff;
-      --text-sub: #a0a0a0;
-      --border-color: #333333;
+      --bg: #0f1115;
+      --card-bg: rgba(255, 255, 255, 0.03);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --jp-accent: #ff4757;
+      --tw-accent: #00d2d3;
+      --text-main: #f1f2f6;
+      --text-sub: #8c7ae6;
+      --text-muted: #718093;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
     }
 
     body {
-      background-color: var(--bg-color);
+      background-color: var(--bg);
       color: var(--text-main);
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
       padding: 12px;
-      overflow: hidden;
     }
 
-    .countdown-container {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: 16px;
-      padding: 20px 16px;
+    /* 全体コンテナ：高さを低く横長に */
+    .clock-widget {
+      background: rgba(22, 25, 35, 0.75);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 14px;
+      padding: 10px 14px 8px 14px;
       width: 100%;
-      max-width: 440px;
-      text-align: center;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      max-width: 520px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
     }
 
-    .header-title {
-      font-size: 0.85rem;
-      font-weight: 600;
-      letter-spacing: 2px;
-      color: var(--text-sub);
-      margin-bottom: 4px;
-    }
-
-    .destination {
-      font-size: 1.3rem;
-      font-weight: 700;
-      background: var(--accent-gradient);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 18px;
-    }
-
-    .timer-grid {
+    .clock-grid {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: 1fr 1fr;
       gap: 8px;
     }
 
-    .time-box {
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid rgba(255, 255, 255, 0.08);
+    /* 各時計カード：横並びレイアウトで省スペース化 */
+    .clock-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
       border-radius: 10px;
-      padding: 12px 2px;
+      padding: 6px 10px;
       display: flex;
       flex-direction: column;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .clock-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 3px;
+      height: 100%;
+    }
+    .card-jp::before { background: var(--jp-accent); }
+    .card-tw::before { background: var(--tw-accent); }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
       align-items: center;
+      margin-bottom: 2px;
     }
 
-    .number {
-      font-size: 1.6rem;
-      font-weight: 800;
-      font-variant-numeric: tabular-nums;
-      color: #ffffff;
-      line-height: 1.1;
-      margin-bottom: 4px;
-    }
-
-    .label {
-      font-size: 0.6rem;
-      font-weight: 600;
-      color: var(--text-sub);
-      text-transform: uppercase;
+    .city-name {
+      font-size: 0.7rem;
+      font-weight: 700;
       letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .card-jp .city-name { color: var(--jp-accent); }
+    .card-tw .city-name { color: var(--tw-accent); }
+
+    .date-display {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      font-weight: 500;
     }
 
-    .departure-date {
-      margin-top: 16px;
-      font-size: 0.78rem;
-      color: var(--text-sub);
-      border-top: 1px dashed var(--border-color);
-      padding-top: 12px;
+    .time-wrapper {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
     }
 
-    @media (max-width: 380px) {
-      .timer-grid { gap: 4px; }
-      .number { font-size: 1.3rem; }
-      .label { font-size: 0.5rem; }
+    .time-display {
+      font-size: 1.45rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.5px;
+      line-height: 1;
+      color: #ffffff;
+    }
+
+    .seconds {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-left: 1px;
+    }
+
+    /* 時差インフォメーション：1行にスッキリ統合 */
+    .time-diff {
+      margin-top: 6px;
+      padding-top: 4px;
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      text-align: center;
+      border-top: 1px dashed rgba(255, 255, 255, 0.06);
+    }
+
+    .time-diff span {
+      color: var(--tw-accent);
+      font-weight: 600;
+    }
+
+    @media (max-width: 400px) {
+      .time-display { font-size: 1.25rem; }
+      .seconds { font-size: 0.75rem; }
+      .clock-widget { padding: 8px; }
     }
   </style>
 </head>
 <body>
 
-  <div class="countdown-container">
-    <div class="header-title">✈️ COUNTDOWN TO TRIP</div>
-    <div class="destination">🇹🇼 台湾旅行 出発まで</div>
+  <div class="clock-widget">
+    <div class="clock-grid">
+      <!-- Japan Clock -->
+      <div class="clock-card card-jp">
+        <div class="card-header">
+          <span class="city-name">🇯🇵 TOKYO</span>
+          <span class="date-display" id="jp-date">--/-- (--)</span>
+        </div>
+        <div class="time-wrapper">
+          <div class="time-display">
+            <span id="jp-time">00:00</span><span class="seconds" id="jp-sec">:00</span>
+          </div>
+        </div>
+      </div>
 
-    <div class="timer-grid">
-      <div class="time-box">
-        <div class="number" id="days">00</div>
-        <div class="label">Days</div>
-      </div>
-      <div class="time-box">
-        <div class="number" id="hours">00</div>
-        <div class="label">Hours</div>
-      </div>
-      <div class="time-box">
-        <div class="number" id="minutes">00</div>
-        <div class="label">Mins</div>
-      </div>
-      <div class="time-box">
-        <div class="number" id="seconds">00</div>
-        <div class="label">Secs</div>
+      <!-- Taipei Clock -->
+      <div class="clock-card card-tw">
+        <div class="card-header">
+          <span class="city-name">🇹🇼 TAIPEI</span>
+          <span class="date-display" id="tw-date">--/-- (--)</span>
+        </div>
+        <div class="time-wrapper">
+          <div class="time-display">
+            <span id="tw-time">00:00</span><span class="seconds" id="tw-sec">:00</span>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="departure-date">
-      出発日時：2026年11月30日(月) 11:45
+    <div class="time-diff">
+      時差: 台北は日本より <span>1時間遅い</span> です
     </div>
   </div>
 
   <script>
-    const targetDate = new Date("2026-11-30T11:45:00+09:00").getTime();
+    const daysJP = ['日', '月', '火', '水', '木', '金', '土'];
 
-    function updateCountdown() {
-      const now = new Date().getTime();
-      const difference = targetDate - now;
+    function updateClocks() {
+      const now = new Date();
 
-      if (difference <= 0) {
-        document.getElementById("days").innerText = "00";
-        document.getElementById("hours").innerText = "00";
-        document.getElementById("minutes").innerText = "00";
-        document.getElementById("seconds").innerText = "00";
-        document.querySelector(".destination").innerText = "🇹🇼 台湾旅行 出発！";
-        return;
-      }
+      // Japan Time (UTC+9)
+      const jpFormatter = new Intl.DateTimeFormat('ja-JP', {
+        timeZone: 'Asia/Tokyo', year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+      });
+      const jpParts = Object.fromEntries(jpFormatter.formatToParts(now).map(p => [p.type, p.value]));
+      const jpDateObj = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Tokyo' }));
 
-      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+      document.getElementById('jp-time').innerText = `${jpParts.hour}:${jpParts.minute}`;
+      document.getElementById('jp-sec').innerText = `:${jpParts.second}`;
+      document.getElementById('jp-date').innerText = `${jpParts.month}/${jpParts.day} (${daysJP[jpDateObj.getDay()]})`;
 
-      document.getElementById("days").innerText = String(days).padStart(2, '0');
-      document.getElementById("hours").innerText = String(hours).padStart(2, '0');
-      document.getElementById("minutes").innerText = String(minutes).padStart(2, '0');
-      document.getElementById("seconds").innerText = String(seconds).padStart(2, '0');
+      // Taipei Time (UTC+8)
+      const twFormatter = new Intl.DateTimeFormat('ja-JP', {
+        timeZone: 'Asia/Taipei', year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+      });
+      const twParts = Object.fromEntries(twFormatter.formatToParts(now).map(p => [p.type, p.value]));
+      const twDateObj = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
+
+      document.getElementById('tw-time').innerText = `${twParts.hour}:${twParts.minute}`;
+      document.getElementById('tw-sec').innerText = `:${twParts.second}`;
+      document.getElementById('tw-date').innerText = `${twParts.month}/${twParts.day} (${daysJP[twDateObj.getDay()]})`;
     }
 
-    updateCountdown();
-    setInterval(updateCountdown, 1000);
+    updateClocks();
+    setInterval(updateClocks, 1000);
   </script>
 </body>
 </html>
