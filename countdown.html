@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Taiwan Trip Countdown</title>
+  <style>
+    :root {
+      --bg-color: #191919;
+      --card-bg: #252525;
+      --accent-gradient: linear-gradient(135deg, #00d2ff 0%, #3a7bd5 100%);
+      --text-main: #ffffff;
+      --text-sub: #a0a0a0;
+      --border-color: #333333;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 12px;
+      overflow: hidden;
+    }
+
+    .countdown-container {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 20px 16px;
+      width: 100%;
+      max-width: 440px;
+      text-align: center;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .header-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      color: var(--text-sub);
+      margin-bottom: 4px;
+    }
+
+    .destination {
+      font-size: 1.3rem;
+      font-weight: 700;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 18px;
+    }
+
+    .timer-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .time-box {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      padding: 12px 2px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .number {
+      font-size: 1.6rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      color: #ffffff;
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+
+    .label {
+      font-size: 0.6rem;
+      font-weight: 600;
+      color: var(--text-sub);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .departure-date {
+      margin-top: 16px;
+      font-size: 0.78rem;
+      color: var(--text-sub);
+      border-top: 1px dashed var(--border-color);
+      padding-top: 12px;
+    }
+
+    @media (max-width: 380px) {
+      .timer-grid { gap: 4px; }
+      .number { font-size: 1.3rem; }
+      .label { font-size: 0.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="countdown-container">
+    <div class="header-title">✈️ COUNTDOWN TO TRIP</div>
+    <div class="destination">🇹🇼 台湾旅行 出発まで</div>
+
+    <div class="timer-grid">
+      <div class="time-box">
+        <div class="number" id="days">00</div>
+        <div class="label">Days</div>
+      </div>
+      <div class="time-box">
+        <div class="number" id="hours">00</div>
+        <div class="label">Hours</div>
+      </div>
+      <div class="time-box">
+        <div class="number" id="minutes">00</div>
+        <div class="label">Mins</div>
+      </div>
+      <div class="time-box">
+        <div class="number" id="seconds">00</div>
+        <div class="label">Secs</div>
+      </div>
+    </div>
+
+    <div class="departure-date">
+      出発日時：2026年11月30日(月) 11:45
+    </div>
+  </div>
+
+  <script>
+    const targetDate = new Date("2026-11-30T11:45:00+09:00").getTime();
+
+    function updateCountdown() {
+      const now = new Date().getTime();
+      const difference = targetDate - now;
+
+      if (difference <= 0) {
+        document.getElementById("days").innerText = "00";
+        document.getElementById("hours").innerText = "00";
+        document.getElementById("minutes").innerText = "00";
+        document.getElementById("seconds").innerText = "00";
+        document.querySelector(".destination").innerText = "🇹🇼 台湾旅行 出発！";
+        return;
+      }
+
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
+
+      document.getElementById("days").innerText = String(days).padStart(2, '0');
+      document.getElementById("hours").innerText = String(hours).padStart(2, '0');
+      document.getElementById("minutes").innerText = String(minutes).padStart(2, '0');
+      document.getElementById("seconds").innerText = String(seconds).padStart(2, '0');
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  </script>
+</body>
+</html>
