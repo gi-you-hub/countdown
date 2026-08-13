@@ -3,24 +3,27 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HUD Cockpit Dashboard - Ultra Compact</title>
+  <title>HUD Dashboard - Simple Color</title>
   <style>
     :root {
-      --hud-cyan: #00f3ff;
-      --hud-magenta: #ff0055;
-      --hud-amber: #ffb700;
+      /* カラーパレットを最小限に整理 */
+      --c-komatsu: #ff6b81; /* 小松用アクセント（薄赤） */
+      --c-taipei: #00d2d3;  /* 台北用アクセント（シアン） */
+      --c-cd: #ffa502;      /* カウントダウン用（ゴールド） */
+      
       --text-main: #ffffff;
-      --text-sub: rgba(255, 255, 255, 0.85);
-      /* カード背景をほぼ完全透明化（写真がくっきり透ける） */
-      --card-bg: rgba(5, 10, 20, 0.25);
-      --card-border: rgba(0, 243, 255, 0.4);
+      --text-sub: rgba(255, 255, 255, 0.8);
+      
+      /* 枠線と背景は白ベースの透明感で統一 */
+      --card-bg: rgba(10, 15, 25, 0.25);
+      --card-border: rgba(255, 255, 255, 0.18);
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
     html, body {
@@ -30,7 +33,7 @@
       background-color: #000;
     }
 
-    /* 背景画像：オーバーレイを極限まで薄く */
+    /* 背景画像：高透過 */
     .dashboard-container {
       position: relative;
       width: 100%;
@@ -44,17 +47,16 @@
       justify-content: space-between;
     }
 
-    /* 周辺の黒みを最小限に抑える */
     .dashboard-container::before {
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.4) 100%);
+      background: radial-gradient(circle at center, transparent 50%, rgba(0,0,0,0.35) 100%);
       z-index: 1;
       pointer-events: none;
     }
 
-    /* 限界まで透過させたネオンカード */
+    /* 統一感のある高透過カード */
     .hud-card {
       position: relative;
       z-index: 2;
@@ -64,30 +66,33 @@
       border: 1px solid var(--card-border);
       border-radius: 6px;
       padding: 6px 10px;
-      box-shadow: 0 0 10px rgba(0, 243, 255, 0.15);
     }
 
-    /* 四隅の近未来ノッチ */
+    /* 四隅の控えめなノッチ */
     .hud-card::after {
       content: '';
       position: absolute;
       bottom: -1px; right: -1px;
-      width: 6px; height: 6px;
-      border-right: 2px solid var(--hud-cyan);
-      border-bottom: 2px solid var(--hud-cyan);
+      width: 5px; height: 5px;
+      border-right: 1.5px solid rgba(255, 255, 255, 0.4);
+      border-bottom: 1.5px solid rgba(255, 255, 255, 0.4);
     }
 
     .card-title {
-      font-size: 0.6rem;
+      font-size: 0.58rem;
       font-weight: 800;
       letter-spacing: 1px;
-      color: var(--hud-cyan);
-      margin-bottom: 3px;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 4px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      text-shadow: 0 0 6px rgba(0, 243, 255, 0.8), 0 1px 3px rgba(0,0,0,0.9);
+      text-shadow: 0 1px 3px rgba(0,0,0,0.9);
     }
+
+    /* 都市ラベルの色定義（時計と天気で共通化） */
+    .label-komatsu { color: var(--c-komatsu) !important; text-shadow: 0 0 6px rgba(255, 107, 129, 0.6), 0 1px 3px rgba(0,0,0,0.9) !important; }
+    .label-taipei { color: var(--c-taipei) !important; text-shadow: 0 0 6px rgba(0, 210, 211, 0.6), 0 1px 3px rgba(0,0,0,0.9) !important; }
 
     /* 右上：カウントダウン */
     .top-right-section {
@@ -100,28 +105,28 @@
 
     .countdown-card {
       text-align: center;
-      border-color: rgba(255, 183, 0, 0.5);
-      min-width: 120px;
+      border-color: rgba(255, 165, 2, 0.35);
+      min-width: 115px;
       padding: 4px 8px;
     }
-    .countdown-card::after { border-color: var(--hud-amber); }
+    .countdown-card::after { border-color: var(--c-cd); }
 
     .countdown-card .card-title {
-      color: var(--hud-amber);
-      text-shadow: 0 0 6px rgba(255, 183, 0, 0.8), 0 1px 3px rgba(0,0,0,0.9);
+      color: var(--c-cd);
+      text-shadow: 0 0 6px rgba(255, 165, 2, 0.6), 0 1px 3px rgba(0,0,0,0.9);
     }
 
     .countdown-val {
-      font-size: 1.8rem;
+      font-size: 1.7rem;
       font-weight: 900;
-      color: var(--hud-amber);
+      color: var(--c-cd);
       line-height: 1;
       font-variant-numeric: tabular-nums;
-      text-shadow: 0 0 10px rgba(255, 183, 0, 0.9), 0 2px 4px rgba(0,0,0,0.9);
+      text-shadow: 0 0 8px rgba(255, 165, 2, 0.7), 0 2px 4px rgba(0,0,0,0.9);
     }
 
     .countdown-unit {
-      font-size: 0.55rem;
+      font-size: 0.52rem;
       color: var(--text-sub);
       letter-spacing: 1px;
       font-weight: 700;
@@ -145,22 +150,18 @@
       gap: 6px;
     }
 
-    .time-card-jp { border-color: rgba(255, 0, 85, 0.5); }
-    .time-card-jp::after { border-color: var(--hud-magenta); }
-    .city-label-jp { color: var(--hud-magenta) !important; text-shadow: 0 0 6px rgba(255, 0, 85, 0.8), 0 1px 3px rgba(0,0,0,0.9) !important; }
-
     .time-num {
       font-size: 1.25rem;
       font-weight: 800;
       color: #ffffff;
       font-variant-numeric: tabular-nums;
       line-height: 1;
-      text-shadow: 0 0 8px rgba(255, 255, 255, 0.8), 0 2px 4px rgba(0, 0, 0, 0.9);
+      text-shadow: 0 0 6px rgba(255, 255, 255, 0.7), 0 2px 4px rgba(0, 0, 0, 0.9);
     }
 
     .time-sec {
       font-size: 0.7rem;
-      color: var(--hud-cyan);
+      color: rgba(255, 255, 255, 0.7);
       font-weight: 600;
     }
 
@@ -172,10 +173,9 @@
     }
 
     .weather-city-title {
-      font-size: 0.60rem;
+      font-size: 0.58rem;
       font-weight: 800;
       margin-bottom: 2px;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.9);
     }
 
     .weather-forecast {
@@ -187,14 +187,14 @@
     .weather-day {
       text-align: center;
       flex: 1;
-      background: rgba(0, 243, 255, 0.08);
-      border: 1px solid rgba(0, 243, 255, 0.2);
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.12);
       padding: 3px 1px;
       border-radius: 4px;
     }
 
     .weather-date { font-size: 0.55rem; color: var(--text-sub); font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.9); }
-    .weather-icon { font-size: 0.95rem; margin: 1px 0; filter: drop-shadow(0 0 4px rgba(0,0,0,0.9)); }
+    .weather-icon { font-size: 0.95rem; margin: 1px 0; filter: drop-shadow(0 0 3px rgba(0,0,0,0.9)); }
     .weather-temp {
       font-size: 0.62rem;
       font-weight: 800;
@@ -226,14 +226,14 @@
 
       <!-- 時計（小松・台北） -->
       <div class="time-grid">
-        <div class="hud-card time-card-jp">
-          <div class="card-title city-label-jp">🇯🇵 KOMATSU</div>
+        <div class="hud-card">
+          <div class="card-title label-komatsu">🇯🇵 KOMATSU</div>
           <div class="time-num">
             <span id="jp-time">00:00</span><span class="time-sec" id="jp-sec">:00</span>
           </div>
         </div>
-        <div class="hud-card time-card-tw">
-          <div class="card-title">🇹🇼 TAIPEI</div>
+        <div class="hud-card">
+          <div class="card-title label-taipei">🇹🇼 TAIPEI</div>
           <div class="time-num">
             <span id="tw-time">00:00</span><span class="time-sec" id="tw-sec">:00</span>
           </div>
@@ -245,7 +245,7 @@
         <div class="weather-container">
           <!-- 小松 -->
           <div>
-            <div class="weather-city-title city-label-jp">KOMATSU</div>
+            <div class="weather-city-title label-komatsu">KOMATSU</div>
             <div class="weather-forecast" id="km-weather">
               <div class="weather-day"><div class="weather-date">今日</div><div class="weather-icon">--</div><div class="weather-temp">--°</div></div>
               <div class="weather-day"><div class="weather-date">明日</div><div class="weather-icon">--</div><div class="weather-temp">--°</div></div>
@@ -254,7 +254,7 @@
           </div>
           <!-- 台北 -->
           <div>
-            <div class="weather-city-title" style="color: var(--hud-cyan);">TAIPEI</div>
+            <div class="weather-city-title label-taipei">TAIPEI</div>
             <div class="weather-forecast" id="tw-weather">
               <div class="weather-day"><div class="weather-date">今日</div><div class="weather-icon">--</div><div class="weather-temp">--°</div></div>
               <div class="weather-day"><div class="weather-date">明日</div><div class="weather-icon">--</div><div class="weather-temp">--°</div></div>
