@@ -158,10 +158,11 @@
       margin-top: -1px;
     }
 
-    /* メンバー表示（右上・HUDタグ風） */
+    /* メンバー表示（Notionの···メニューボタンと干渉しないよう右余白を追加） */
     .members-hud-tag {
       text-align: right;
       padding: 2px 4px;
+      margin-right: 42px; /* Notionメニュー避けるためのマージン */
       max-width: 65%;
     }
 
@@ -321,7 +322,7 @@
 
   <div class="dashboard-container">
 
-    <!-- 上部：カウントダウン(左) ＆ メンバー(右) -->
+    <!-- 上部：カウントダウン(左) ＆ メンバー(右・ボタン退避用余白付き) -->
     <div class="top-section">
       <!-- 左：カウントダウン -->
       <div class="direct-countdown">
@@ -380,7 +381,6 @@
   </div>
 
   <script>
-    // 1. カウントダウン
     function updateCountdown() {
       const now = new Date();
       let targetYear = now.getFullYear();
@@ -393,7 +393,6 @@
       document.getElementById('cd-days').innerText = days;
     }
 
-    // 2. 為替レート (TWD -> JPY)
     async function fetchExchangeRate() {
       try {
         const res = await fetch('https://open.er-api.com/v6/latest/TWD');
@@ -409,7 +408,6 @@
       }
     }
 
-    // 3. 台北時間更新
     function updateClocks() {
       const now = new Date();
       const twFmt = new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Taipei', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
@@ -418,7 +416,6 @@
       document.getElementById('tw-sec').innerText = `:${twP.second}`;
     }
 
-    // 4. 台北天気予報
     function getWeatherEmoji(code) {
       if (code === 0) return '☀️';
       if (code >= 1 && code <= 3) return '⛅';
@@ -458,15 +455,13 @@
       }
     }
 
-    // 初回実行
     updateCountdown();
     updateClocks();
     fetchWeatherData();
     fetchExchangeRate();
 
-    // 定期更新
     setInterval(updateClocks, 1000);
-    setInterval(fetchExchangeRate, 3600000); // 1時間ごと
+    setInterval(fetchExchangeRate, 3600000);
   </script>
 </body>
 </html>
