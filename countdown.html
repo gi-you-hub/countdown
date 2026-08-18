@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HUD Dashboard - Mobile Optimized</title>
+  <title>HUD Dashboard - Integrated Layout</title>
   <style>
     :root {
       /* カラーパレット */
@@ -16,6 +16,7 @@
       
       /* 枠線と背景 */
       --card-bg: rgba(10, 15, 25, 0.35);
+      --card-bg-hover: rgba(20, 30, 50, 0.55);
       --card-border: rgba(255, 255, 255, 0.18);
     }
 
@@ -56,7 +57,7 @@
       pointer-events: none;
     }
 
-    /* 透過HUDカード */
+    /* 透過HUDカード（リンク兼用） */
     .hud-card {
       position: relative;
       z-index: 2;
@@ -65,8 +66,20 @@
       -webkit-backdrop-filter: blur(4px);
       border: 1px solid var(--card-border);
       border-radius: 6px;
-      padding: 6px 6px;
-      min-width: 0; /* 折り返し防止 */
+      padding: 6px 8px;
+      min-width: 0;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: background 0.2s ease, border-color 0.2s ease;
+      cursor: pointer;
+    }
+
+    .hud-card:hover, .hud-card:active {
+      background: var(--card-bg-hover);
+      border-color: rgba(255, 255, 255, 0.35);
     }
 
     /* 四隅のノッチ */
@@ -142,20 +155,37 @@
       margin-top: -1px;
     }
 
-    /* 下部：スマホでも絶対に横並び（3列固定） */
+    /* 下部：2:1 比率のレイアウト */
     .bottom-grid {
       position: relative;
       z-index: 2;
       display: grid;
-      grid-template-columns: 1fr 1fr 1.2fr;
-      gap: 5px;
-      align-items: end;
+      grid-template-columns: 2fr 1fr; /* 2 : 1 の横幅比率 */
+      gap: 6px;
+      align-items: stretch;
       width: 100%;
+    }
+
+    /* カード内部ボディ */
+    .card-body {
+      display: flex;
+      align-items: center;
+      flex-grow: 1;
+      padding-top: 2px;
+    }
+
+    /* 時刻と天気の統合レイアウト */
+    .integrated-body {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      gap: 8px;
     }
 
     /* 台湾時間 */
     .time-num {
-      font-size: 1.15rem;
+      font-size: 1.25rem;
       font-weight: 800;
       color: #ffffff;
       font-variant-numeric: tabular-nums;
@@ -170,29 +200,12 @@
       font-weight: 600;
     }
 
-    /* 為替レート */
-    .rate-val {
-      font-size: 1.15rem;
-      font-weight: 900;
-      color: var(--c-rate);
-      line-height: 1;
-      font-variant-numeric: tabular-nums;
-      text-shadow: 0 0 8px rgba(46, 213, 115, 0.7), 0 2px 4px rgba(0,0,0,0.9);
-      white-space: nowrap;
-    }
-
-    .rate-unit {
-      font-size: 0.65rem;
-      font-weight: 700;
-      color: rgba(255, 255, 255, 0.8);
-      margin-left: 1px;
-    }
-
-    /* 台北天気 */
+    /* 天気予報エリア */
     .weather-forecast {
       display: flex;
       justify-content: space-between;
-      gap: 2px;
+      gap: 3px;
+      flex-grow: 1;
     }
 
     .weather-day {
@@ -213,6 +226,31 @@
       color: #ffffff;
       text-shadow: 0 1px 3px rgba(0,0,0,0.9);
     }
+
+    /* 為替レートエリア */
+    .rate-body {
+      display: flex;
+      align-items: flex-end;
+      justify-content: flex-start;
+      height: 100%;
+    }
+
+    .rate-val {
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: var(--c-rate);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      text-shadow: 0 0 8px rgba(46, 213, 115, 0.7), 0 2px 4px rgba(0,0,0,0.9);
+      white-space: nowrap;
+    }
+
+    .rate-unit {
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.8);
+      margin-left: 1px;
+    }
   </style>
 </head>
 <body>
@@ -228,34 +266,37 @@
       </div>
     </div>
 
-    <!-- 下部：スマホでも横並び3カラム（時間・為替・天気） -->
+    <!-- 下部：2:1比率の横並び（比率 2：時刻・天気融合 / 比率 1：為替） -->
     <div class="bottom-grid">
 
-      <!-- 1. 台湾時間 -->
-      <div class="hud-card">
-        <div class="card-title label-taipei">🇹🇼 TAIPEI TIME</div>
-        <div class="time-num">
-          <span id="tw-time">00:00</span><span class="time-sec" id="tw-sec">:00</span>
+      <!-- 1. 時刻 & 天気 統合ボックス (比率: 2) -->
+      <a href="https://tenki.jp/world/5/88/58968/" target="_blank" class="hud-card">
+        <div class="card-title label-taipei">🇹🇼 TAIPEI TIME & FORECAST</div>
+        <div class="card-body">
+          <div class="integrated-body">
+            <!-- 時間 -->
+            <div class="time-num">
+              <span id="tw-time">00:00</span><span class="time-sec" id="tw-sec">:00</span>
+            </div>
+            <!-- 天気予報 -->
+            <div class="weather-forecast" id="tw-weather">
+              <div class="weather-day"><div class="weather-date">今日</div><div class="weather-icon">--</div><div class="weather-temp">--°</div></div>
+              <div class="weather-day"><div class="weather-date">明日</div><div class="weather-icon">--</div><div class="weather-temp">--°</div></div>
+              <div class="weather-day"><div class="weather-date">明後日</div><div class="weather-icon">--</div><div class="weather-temp">--°</div></div>
+            </div>
+          </div>
         </div>
-      </div>
+      </a>
 
-      <!-- 2. 為替レート -->
-      <div class="hud-card">
+      <!-- 2. 為替レート ボックス (比率: 1) -->
+      <a href="https://www.google.com/finance/beta/quote/TWD-JPY?sa=X&ved=2ahUKEwjW8OHNiKqWAxWnqFYBHUbqM74QmY0JegQIIBAm" target="_blank" class="hud-card">
         <div class="card-title label-rate">🪪 TWD / JPY</div>
-        <div class="rate-val">
-          <span id="twd-rate">--.--</span><span class="rate-unit">円</span>
+        <div class="card-body rate-body">
+          <div class="rate-val">
+            <span id="twd-rate">--.--</span><span class="rate-unit">円</span>
+          </div>
         </div>
-      </div>
-
-      <!-- 3. 台北3日間天気 -->
-      <div class="hud-card">
-        <div class="card-title label-taipei">🇹🇼 TAIPEI FORECAST</div>
-        <div class="weather-forecast" id="tw-weather">
-          <div class="weather-day"><div class="weather-date">今日</div><div class="weather-icon">--</div><div class="weather-temp">--°</div></div>
-          <div class="weather-day"><div class="weather-date">明日</div><div class="weather-icon">--</div><div class="weather-temp">--°</div></div>
-          <div class="weather-day"><div class="weather-date">明後日</div><div class="weather-icon">--</div><div class="weather-temp">--°</div></div>
-        </div>
-      </div>
+      </a>
 
     </div>
 
