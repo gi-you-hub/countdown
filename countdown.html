@@ -115,16 +115,16 @@
       text-shadow: 0 0 6px rgba(46, 213, 115, 0.6), 0 1px 3px rgba(0,0,0,0.9) !important; 
     }
 
-    /* 上部：枠なしダイレクト・カウントダウン */
-    .top-right-section {
+    /* 上部：枠なしダイレクト・カウントダウン（左寄せ） */
+    .top-left-section {
       display: flex;
-      justify-content: flex-end;
+      justify-content: flex-start;
       position: relative;
       z-index: 2;
     }
 
     .direct-countdown {
-      text-align: right;
+      text-align: left;
       padding: 2px 4px;
     }
 
@@ -257,8 +257,8 @@
 
   <div class="dashboard-container">
 
-    <!-- 右上：枠なしダイレクト・カウントダウン -->
-    <div class="top-right-section">
+    <!-- 左上：枠なしダイレクト・カウントダウン -->
+    <div class="top-left-section">
       <div class="direct-countdown">
         <div class="countdown-header">COUNTDOWN</div>
         <div class="countdown-val" id="cd-days">--</div>
