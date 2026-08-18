@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HUD Dashboard - Simple Color</title>
+  <title>HUD Dashboard - Taipei Modern</title>
   <style>
     :root {
-      /* カラーパレットを最小限に整理 */
-      --c-komatsu: #ff6b81; /* 小松用アクセント（薄赤） */
+      /* カラーパレット */
       --c-taipei: #00d2d3;  /* 台北用アクセント（シアン） */
       --c-cd: #ffa502;      /* カウントダウン用（ゴールド） */
+      --c-rate: #2ed573;    /* 為替レート用（エメラルドグリーン） */
       
       --text-main: #ffffff;
       --text-sub: rgba(255, 255, 255, 0.8);
       
-      /* 枠線と背景は白ベースの透明感で統一 */
-      --card-bg: rgba(10, 15, 25, 0.25);
+      /* 枠線と背景 */
+      --card-bg: rgba(10, 15, 25, 0.35);
       --card-border: rgba(255, 255, 255, 0.18);
     }
 
@@ -33,7 +33,7 @@
       background-color: #000;
     }
 
-    /* 背景画像：高透過 */
+    /* 背景画像：高透過・固定1枚 */
     .dashboard-container {
       position: relative;
       width: 100%;
@@ -41,7 +41,7 @@
       background-image: url('https://www.travel.taipei/image/339510/?r=1673063414149');
       background-size: cover;
       background-position: center;
-      padding: 10px 14px;
+      padding: 14px 18px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -51,12 +51,12 @@
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: radial-gradient(circle at center, transparent 50%, rgba(0,0,0,0.35) 100%);
+      background: radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.45) 100%);
       z-index: 1;
       pointer-events: none;
     }
 
-    /* 統一感のある高透過カード */
+    /* 透過HUDカード */
     .hud-card {
       position: relative;
       z-index: 2;
@@ -65,10 +65,10 @@
       -webkit-backdrop-filter: blur(4px);
       border: 1px solid var(--card-border);
       border-radius: 6px;
-      padding: 6px 10px;
+      padding: 8px 12px;
     }
 
-    /* 四隅の控えめなノッチ */
+    /* 四隅のノッチ */
     .hud-card::after {
       content: '';
       position: absolute;
@@ -83,75 +83,75 @@
       font-weight: 800;
       letter-spacing: 1px;
       color: rgba(255, 255, 255, 0.7);
-      margin-bottom: 4px;
+      margin-bottom: 6px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       text-shadow: 0 1px 3px rgba(0,0,0,0.9);
     }
 
-    /* 都市ラベルの色定義（時計と天気で共通化） */
-    .label-komatsu { color: var(--c-komatsu) !important; text-shadow: 0 0 6px rgba(255, 107, 129, 0.6), 0 1px 3px rgba(0,0,0,0.9) !important; }
-    .label-taipei { color: var(--c-taipei) !important; text-shadow: 0 0 6px rgba(0, 210, 211, 0.6), 0 1px 3px rgba(0,0,0,0.9) !important; }
+    .label-taipei { 
+      color: var(--c-taipei) !important; 
+      text-shadow: 0 0 6px rgba(0, 210, 211, 0.6), 0 1px 3px rgba(0,0,0,0.9) !important; 
+    }
+    .label-rate { 
+      color: var(--c-rate) !important; 
+      text-shadow: 0 0 6px rgba(46, 213, 115, 0.6), 0 1px 3px rgba(0,0,0,0.9) !important; 
+    }
 
-    /* 右上：カウントダウン */
+    /* 上部：枠なしダイレクト・カウントダウン */
     .top-right-section {
       display: flex;
       justify-content: flex-end;
       position: relative;
       z-index: 2;
-      margin-bottom: 6px;
     }
 
-    .countdown-card {
-      text-align: center;
-      border-color: rgba(255, 165, 2, 0.35);
-      min-width: 115px;
-      padding: 4px 8px;
+    .direct-countdown {
+      text-align: right;
+      padding: 4px 6px;
     }
-    .countdown-card::after { border-color: var(--c-cd); }
 
-    .countdown-card .card-title {
+    .countdown-header {
+      font-size: 0.55rem;
+      font-weight: 800;
+      letter-spacing: 1.5px;
       color: var(--c-cd);
       text-shadow: 0 0 6px rgba(255, 165, 2, 0.6), 0 1px 3px rgba(0,0,0,0.9);
+      margin-bottom: -2px;
     }
 
     .countdown-val {
-      font-size: 1.7rem;
+      font-size: 2.2rem;
       font-weight: 900;
       color: var(--c-cd);
       line-height: 1;
       font-variant-numeric: tabular-nums;
-      text-shadow: 0 0 8px rgba(255, 165, 2, 0.7), 0 2px 4px rgba(0,0,0,0.9);
+      text-shadow: 0 0 10px rgba(255, 165, 2, 0.8), 0 2px 5px rgba(0,0,0,0.9);
     }
 
     .countdown-unit {
       font-size: 0.52rem;
-      color: var(--text-sub);
-      letter-spacing: 1px;
+      color: rgba(255, 255, 255, 0.85);
+      letter-spacing: 1.5px;
       font-weight: 700;
       text-shadow: 0 1px 2px rgba(0,0,0,0.9);
+      margin-top: -1px;
     }
 
-    /* 下部：2カラムグリッド */
+    /* 下部：3つのカードを横並び（時刻・為替・天気） */
     .bottom-grid {
       position: relative;
       z-index: 2;
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 8px;
+      grid-template-columns: 1fr 1fr 1.2fr;
+      gap: 10px;
       align-items: end;
     }
 
-    /* 時計 */
-    .time-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
-    }
-
+    /* 台湾時間 */
     .time-num {
-      font-size: 1.25rem;
+      font-size: 1.5rem;
       font-weight: 800;
       color: #ffffff;
       font-variant-numeric: tabular-nums;
@@ -160,28 +160,33 @@
     }
 
     .time-sec {
-      font-size: 0.7rem;
+      font-size: 0.8rem;
       color: rgba(255, 255, 255, 0.7);
       font-weight: 600;
     }
 
-    /* 天気 */
-    .weather-container {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 6px;
+    /* 為替レート */
+    .rate-val {
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--c-rate);
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      text-shadow: 0 0 8px rgba(46, 213, 115, 0.7), 0 2px 4px rgba(0,0,0,0.9);
     }
 
-    .weather-city-title {
-      font-size: 0.58rem;
-      font-weight: 800;
-      margin-bottom: 2px;
+    .rate-unit {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.8);
+      margin-left: 2px;
     }
 
+    /* 台北天気 */
     .weather-forecast {
       display: flex;
       justify-content: space-between;
-      gap: 2px;
+      gap: 4px;
     }
 
     .weather-day {
@@ -189,22 +194,21 @@
       flex: 1;
       background: rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255, 255, 255, 0.12);
-      padding: 3px 1px;
+      padding: 3px 2px;
       border-radius: 4px;
     }
 
     .weather-date { font-size: 0.55rem; color: var(--text-sub); font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.9); }
     .weather-icon { font-size: 0.95rem; margin: 1px 0; filter: drop-shadow(0 0 3px rgba(0,0,0,0.9)); }
     .weather-temp {
-      font-size: 0.62rem;
+      font-size: 0.65rem;
       font-weight: 800;
       color: #ffffff;
       text-shadow: 0 1px 3px rgba(0,0,0,0.9);
     }
 
-    @media (max-width: 520px) {
+    @media (max-width: 580px) {
       .bottom-grid { grid-template-columns: 1fr; }
-      .time-num { font-size: 1.1rem; }
     }
   </style>
 </head>
@@ -212,55 +216,41 @@
 
   <div class="dashboard-container">
 
-    <!-- カウントダウン -->
+    <!-- 右上：枠なしダイレクト・カウントダウン -->
     <div class="top-right-section">
-      <div class="hud-card countdown-card">
-        <div class="card-title">COUNTDOWN</div>
+      <div class="direct-countdown">
+        <div class="countdown-header">COUNTDOWN</div>
         <div class="countdown-val" id="cd-days">--</div>
         <div class="countdown-unit">DAYS LEFT</div>
       </div>
     </div>
 
-    <!-- 下部コンポーネント -->
+    <!-- 下部：横並び3カラム（時間・為替・天気） -->
     <div class="bottom-grid">
 
-      <!-- 時計（小松・台北） -->
-      <div class="time-grid">
-        <div class="hud-card">
-          <div class="card-title label-komatsu">🇯🇵 KOMATSU</div>
-          <div class="time-num">
-            <span id="jp-time">00:00</span><span class="time-sec" id="jp-sec">:00</span>
-          </div>
-        </div>
-        <div class="hud-card">
-          <div class="card-title label-taipei">🇹🇼 TAIPEI</div>
-          <div class="time-num">
-            <span id="tw-time">00:00</span><span class="time-sec" id="tw-sec">:00</span>
-          </div>
+      <!-- 1. 台湾時間 -->
+      <div class="hud-card">
+        <div class="card-title label-taipei">🇹🇼 TAIPEI TIME</div>
+        <div class="time-num">
+          <span id="tw-time">00:00</span><span class="time-sec" id="tw-sec">:00</span>
         </div>
       </div>
 
-      <!-- 3日間天気（小松・台北） -->
+      <!-- 2. 為替レート -->
       <div class="hud-card">
-        <div class="weather-container">
-          <!-- 小松 -->
-          <div>
-            <div class="weather-city-title label-komatsu">KOMATSU</div>
-            <div class="weather-forecast" id="km-weather">
-              <div class="weather-day"><div class="weather-date">今日</div><div class="weather-icon">--</div><div class="weather-temp">--°</div></div>
-              <div class="weather-day"><div class="weather-date">明日</div><div class="weather-icon">--</div><div class="weather-temp">--°</div></div>
-              <div class="weather-day"><div class="weather-date">明後日</div><div class="weather-icon">--</div><div class="weather-temp">--°</div></div>
-            </div>
-          </div>
-          <!-- 台北 -->
-          <div>
-            <div class="weather-city-title label-taipei">TAIPEI</div>
-            <div class="weather-forecast" id="tw-weather">
-              <div class="weather-day"><div class="weather-date">今日</div><div class="weather-icon">--</div><div class="weather-temp">--°</div></div>
-              <div class="weather-day"><div class="weather-date">明日</div><div class="weather-icon">--</div><div class="weather-temp">--°</div></div>
-              <div class="weather-day"><div class="weather-date">明後日</div><div class="weather-icon">--</div><div class="weather-temp">--°</div></div>
-            </div>
-          </div>
+        <div class="card-title label-rate">🪪 TWD / JPY</div>
+        <div class="rate-val">
+          <span id="twd-rate">--.--</span><span class="rate-unit">円</span>
+        </div>
+      </div>
+
+      <!-- 3. 台北3日間天気 -->
+      <div class="hud-card">
+        <div class="card-title label-taipei">🇹🇼 TAIPEI FORECAST</div>
+        <div class="weather-forecast" id="tw-weather">
+          <div class="weather-day"><div class="weather-date">今日</div><div class="weather-icon">--</div><div class="weather-temp">--°</div></div>
+          <div class="weather-day"><div class="weather-date">明日</div><div class="weather-icon">--</div><div class="weather-temp">--°</div></div>
+          <div class="weather-day"><div class="weather-date">明後日</div><div class="weather-icon">--</div><div class="weather-temp">--°</div></div>
         </div>
       </div>
 
@@ -269,7 +259,7 @@
   </div>
 
   <script>
-    // カウントダウン
+    // 1. カウントダウン
     function updateCountdown() {
       const now = new Date();
       let targetYear = now.getFullYear();
@@ -282,21 +272,29 @@
       document.getElementById('cd-days').innerText = days;
     }
 
-    // 時計更新
+    // 2. 為替レート (TWD -> JPY)
+    async function fetchExchangeRate() {
+      try {
+        const res = await fetch('https://open.er-api.com/v6/latest/TWD');
+        const data = await res.json();
+        if (data && data.rates && data.rates.JPY) {
+          document.getElementById('twd-rate').innerText = data.rates.JPY.toFixed(2);
+        }
+      } catch (e) {
+        console.log('為替データ取得失敗');
+      }
+    }
+
+    // 3. 台北時間更新
     function updateClocks() {
       const now = new Date();
-      
-      const jpFmt = new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Tokyo', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-      const jpP = Object.fromEntries(jpFmt.formatToParts(now).map(p => [p.type, p.value]));
-      document.getElementById('jp-time').innerText = `${jpP.hour}:${jpP.minute}`;
-      document.getElementById('jp-sec').innerText = `:${jpP.second}`;
-
       const twFmt = new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Taipei', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
       const twP = Object.fromEntries(twFmt.formatToParts(now).map(p => [p.type, p.value]));
       document.getElementById('tw-time').innerText = `${twP.hour}:${twP.minute}`;
       document.getElementById('tw-sec').innerText = `:${twP.second}`;
     }
 
+    // 4. 台北天気予報
     function getWeatherEmoji(code) {
       if (code === 0) return '☀️';
       if (code >= 1 && code <= 3) return '⛅';
@@ -307,47 +305,44 @@
       return '🌤️';
     }
 
-    // 天気取得（小松市は気象庁JMA MSMモデルを指定）
     async function fetchWeatherData() {
-      const kmUrl = 'https://api.open-meteo.com/v1/forecast?latitude=36.4026&longitude=136.4507&daily=weathercode,temperature_2m_max&timezone=Asia%2FTokyo&models=jma_msm';
       const twUrl = 'https://api.open-meteo.com/v1/forecast?latitude=25.0330&longitude=121.5654&daily=weathercode,temperature_2m_max&timezone=Asia%2FTaipei';
 
-      const renderWeather = (elementId, data) => {
-        if (!data || !data.daily) return;
-        const codes = data.daily.weathercode;
-        const temps = data.daily.temperature_2m_max;
-        const labels = ['今日', '明日', '明後日'];
-        
-        let html = '';
-        for (let i = 0; i < 3; i++) {
-          html += `
-            <div class="weather-day">
-              <div class="weather-date">${labels[i]}</div>
-              <div class="weather-icon">${getWeatherEmoji(codes[i])}</div>
-              <div class="weather-temp">${Math.round(temps[i])}°</div>
-            </div>
-          `;
-        }
-        document.getElementById(elementId).innerHTML = html;
-      };
-
       try {
-        const [kmRes, twRes] = await Promise.all([fetch(kmUrl), fetch(twUrl)]);
-        const kmData = await kmRes.json();
-        const twData = await twRes.json();
+        const res = await fetch(twUrl);
+        const data = await res.json();
 
-        renderWeather('km-weather', kmData);
-        renderWeather('tw-weather', twData);
+        if (data && data.daily) {
+          const codes = data.daily.weathercode;
+          const temps = data.daily.temperature_2m_max;
+          const labels = ['今日', '明日', '明後日'];
+          
+          let html = '';
+          for (let i = 0; i < 3; i++) {
+            html += `
+              <div class="weather-day">
+                <div class="weather-date">${labels[i]}</div>
+                <div class="weather-icon">${getWeatherEmoji(codes[i])}</div>
+                <div class="weather-temp">${Math.round(temps[i])}°</div>
+              </div>
+            `;
+          }
+          document.getElementById('tw-weather').innerHTML = html;
+        }
       } catch (e) {
         console.log('天気データ取得スキップ');
       }
     }
 
+    // 初回実行
     updateCountdown();
     updateClocks();
     fetchWeatherData();
+    fetchExchangeRate();
 
+    // 定期更新
     setInterval(updateClocks, 1000);
+    setInterval(fetchExchangeRate, 3600000); // 1時間ごと
   </script>
 </body>
 </html>
