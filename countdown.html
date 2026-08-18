@@ -3,10 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HUD Dashboard - Taipei Edition</title>
+  <title>HUD Dashboard - Redesigned Edition</title>
   <style>
     :root {
-      /* カラーパレット */
       --c-taipei: #00d2d3;  /* 台北用アクセント（シアン） */
       --c-cd: #ffa502;      /* カウントダウン用（ゴールド） */
       --c-rate: #2ed573;    /* 為替レート用（エメラルドグリーン） */
@@ -15,9 +14,8 @@
       --text-main: #ffffff;
       --text-sub: rgba(255, 255, 255, 0.8);
       
-      /* 枠線と背景 */
-      --card-bg: rgba(10, 15, 25, 0.35);
-      --card-bg-hover: rgba(20, 30, 50, 0.55);
+      --card-bg: rgba(10, 15, 25, 0.4);
+      --card-bg-hover: rgba(20, 30, 50, 0.6);
       --card-border: rgba(255, 255, 255, 0.18);
     }
 
@@ -35,7 +33,6 @@
       background-color: #000;
     }
 
-    /* 背景画像：高透過・固定1枚 */
     .dashboard-container {
       position: relative;
       width: 100%;
@@ -43,7 +40,7 @@
       background-image: url('https://www.travel.taipei/image/339510/?r=1673063414149');
       background-size: cover;
       background-position: center;
-      padding: 10px 8px;
+      padding: 12px 10px;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -53,21 +50,21 @@
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.45) 100%);
+      background: radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.55) 100%);
       z-index: 1;
       pointer-events: none;
     }
 
-    /* 透過HUDカード */
+    /* 共通HUDカード */
     .hud-card {
       position: relative;
       z-index: 2;
       background: var(--card-bg);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
       border: 1px solid var(--card-border);
       border-radius: 6px;
-      padding: 6px 8px;
+      padding: 8px 10px;
       min-width: 0;
       text-decoration: none;
       color: inherit;
@@ -83,7 +80,6 @@
       border-color: rgba(255, 255, 255, 0.35);
     }
 
-    /* 四隅のノッチ */
     .hud-card::after {
       content: '';
       position: absolute;
@@ -107,105 +103,54 @@
       overflow: hidden;
     }
 
-    .label-taipei { 
-      color: var(--c-taipei) !important; 
-      text-shadow: 0 0 6px rgba(0, 210, 211, 0.6), 0 1px 3px rgba(0,0,0,0.9) !important; 
-    }
-    .label-rate { 
-      color: var(--c-rate) !important; 
-      text-shadow: 0 0 6px rgba(46, 213, 115, 0.6), 0 1px 3px rgba(0,0,0,0.9) !important; 
-    }
+    .label-taipei { color: var(--c-taipei) !important; text-shadow: 0 0 6px rgba(0, 210, 211, 0.6), 0 1px 3px rgba(0,0,0,0.9) !important; }
+    .label-rate { color: var(--c-rate) !important; text-shadow: 0 0 6px rgba(46, 213, 115, 0.6), 0 1px 3px rgba(0,0,0,0.9) !important; }
 
-    /* 上部：カウントダウン(左) ＆ メンバー(右) */
-    .top-section {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
+    /* ==========================================
+       1. 上部：カウントダウン（ミニママル・バー）
+       ========================================== */
+    .top-bar {
       position: relative;
       z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(10, 15, 25, 0.45);
+      border: 1px solid rgba(255, 165, 2, 0.3);
+      backdrop-filter: blur(4px);
+      border-radius: 4px;
+      padding: 4px 8px;
+      width: fit-content;
     }
 
-    /* カウントダウン */
-    .direct-countdown {
-      text-align: left;
-      padding: 2px 4px;
-    }
-
-    .countdown-header {
+    .cd-label {
       font-size: 0.5rem;
       font-weight: 800;
-      letter-spacing: 1.2px;
+      letter-spacing: 1px;
       color: var(--c-cd);
-      text-shadow: 0 0 6px rgba(255, 165, 2, 0.6), 0 1px 3px rgba(0,0,0,0.9);
-      margin-bottom: -2px;
+      text-shadow: 0 0 6px rgba(255, 165, 2, 0.6);
     }
 
-    .countdown-val {
-      font-size: 2rem;
+    .cd-val {
+      font-size: 1.1rem;
       font-weight: 900;
       color: var(--c-cd);
       line-height: 1;
       font-variant-numeric: tabular-nums;
-      text-shadow: 0 0 10px rgba(255, 165, 2, 0.8), 0 2px 5px rgba(0,0,0,0.9);
+      text-shadow: 0 0 8px rgba(255, 165, 2, 0.8);
     }
 
-    .countdown-unit {
+    .cd-unit {
       font-size: 0.48rem;
-      color: rgba(255, 255, 255, 0.85);
-      letter-spacing: 1.2px;
       font-weight: 700;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.9);
-      margin-top: -1px;
-    }
-
-    /* メンバー表示（Notionの···メニューボタンと干渉しないよう右余白を追加） */
-    .members-hud-tag {
-      text-align: right;
-      padding: 2px 4px;
-      margin-right: 42px; /* Notionメニュー避けるためのマージン */
-      max-width: 65%;
-    }
-
-    .members-header {
-      font-size: 0.48rem;
-      font-weight: 800;
-      letter-spacing: 1px;
-      color: var(--c-member);
-      text-shadow: 0 0 6px rgba(112, 161, 255, 0.6), 0 1px 3px rgba(0,0,0,0.9);
-      margin-bottom: 2px;
-      display: flex;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 3px;
-    }
-
-    .members-header::before {
-      content: '';
-      display: inline-block;
-      width: 4px;
-      height: 4px;
-      background-color: var(--c-member);
-      border-radius: 50%;
-      box-shadow: 0 0 5px var(--c-member);
-    }
-
-    .members-list {
-      font-size: 0.58rem;
-      font-weight: 700;
-      color: rgba(255, 255, 255, 0.9);
+      color: rgba(255, 255, 255, 0.8);
       letter-spacing: 0.5px;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.9);
-      line-height: 1.2;
     }
 
-    .members-list span {
-      color: rgba(255, 255, 255, 0.4);
-      margin: 0 2px;
-      font-weight: 400;
-    }
-
-    /* 下部：2:1 比率のレイアウト */
-    .bottom-grid {
+    /* ==========================================
+       2. 中央：メイン情報グリッド（2:1）
+       ========================================== */
+    .main-grid {
       position: relative;
       z-index: 2;
       display: grid;
@@ -213,6 +158,7 @@
       gap: 6px;
       align-items: stretch;
       width: 100%;
+      margin: auto 0;
     }
 
     .card-body {
@@ -222,7 +168,6 @@
       padding-top: 2px;
     }
 
-    /* 時刻と天気の統合レイアウト */
     .integrated-body {
       display: flex;
       justify-content: space-between;
@@ -264,16 +209,11 @@
       min-width: 0;
     }
 
-    .weather-date { font-size: 0.48rem; color: var(--text-sub); font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.9); }
+    .weather-date { font-size: 0.48rem; color: var(--text-sub); font-weight: 600; }
     .weather-icon { font-size: 0.8rem; margin: 1px 0; filter: drop-shadow(0 0 3px rgba(0,0,0,0.9)); }
-    .weather-temp {
-      font-size: 0.55rem;
-      font-weight: 800;
-      color: #ffffff;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.9);
-    }
+    .weather-temp { font-size: 0.55rem; font-weight: 800; color: #ffffff; }
 
-    /* 為替レートエリア */
+    /* 為替エリア */
     .rate-container {
       display: flex;
       flex-direction: column;
@@ -293,7 +233,7 @@
       color: var(--c-rate);
       line-height: 1;
       font-variant-numeric: tabular-nums;
-      text-shadow: 0 0 8px rgba(46, 213, 115, 0.7), 0 2px 4px rgba(0,0,0,0.9);
+      text-shadow: 0 0 8px rgba(46, 213, 115, 0.7);
       white-space: nowrap;
     }
 
@@ -316,34 +256,84 @@
       color: rgba(255, 255, 255, 0.85);
       font-weight: 600;
     }
+
+    /* ==========================================
+       3. 下部：メンバー表示（スタイリッシュ・フッター）
+       ========================================== */
+    .bottom-footer {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(10, 15, 25, 0.4);
+      border: 1px solid rgba(112, 161, 255, 0.25);
+      backdrop-filter: blur(4px);
+      border-radius: 4px;
+      padding: 3px 8px;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    .footer-label {
+      font-size: 0.48rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: var(--c-member);
+      text-shadow: 0 0 6px rgba(112, 161, 255, 0.6);
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .footer-label::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 4px;
+      background-color: var(--c-member);
+      border-radius: 50%;
+      box-shadow: 0 0 5px var(--c-member);
+    }
+
+    .footer-divider {
+      color: rgba(255, 255, 255, 0.2);
+      font-size: 0.5rem;
+    }
+
+    .footer-members {
+      font-size: 0.55rem;
+      font-weight: 700;
+      color: rgba(255, 255, 255, 0.9);
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .footer-members span {
+      color: rgba(255, 255, 255, 0.35);
+      margin: 0 2px;
+      font-weight: 400;
+    }
   </style>
 </head>
 <body>
 
   <div class="dashboard-container">
 
-    <!-- 上部：カウントダウン(左) ＆ メンバー(右・ボタン退避用余白付き) -->
-    <div class="top-section">
-      <!-- 左：カウントダウン -->
-      <div class="direct-countdown">
-        <div class="countdown-header">COUNTDOWN</div>
-        <div class="countdown-val" id="cd-days">--</div>
-        <div class="countdown-unit">DAYS LEFT</div>
-      </div>
-
-      <!-- 右：参加メンバー -->
-      <div class="members-hud-tag">
-        <div class="members-header">MEMBERS</div>
-        <div class="members-list">
-          Dai <span>•</span> Katsumi <span>•</span> Masaki <span>•</span> Tanchi <span>•</span> Yohei
-        </div>
-      </div>
+    <!-- 1. 上部：カウントダウン（上部にすっきり配置） -->
+    <div class="top-bar">
+      <span class="cd-label">COUNTDOWN</span>
+      <span class="cd-val" id="cd-days">--</span>
+      <span class="cd-unit">DAYS LEFT</span>
     </div>
 
-    <!-- 下部：2:1比率の横並び -->
-    <div class="bottom-grid">
+    <!-- 2. 中央：メイン情報（時刻・天気 ＆ 為替） -->
+    <div class="main-grid">
 
-      <!-- 1. 時刻 & 天気 統合ボックス -->
+      <!-- 左：時刻 & 天気 統合ボックス -->
       <a href="https://tenki.jp/world/5/88/58968/" target="_blank" class="hud-card">
         <div class="card-title label-taipei">🇹🇼 TAIPEI TIME & FORECAST</div>
         <div class="card-body">
@@ -360,7 +350,7 @@
         </div>
       </a>
 
-      <!-- 2. 為替レート ボックス -->
+      <!-- 右：為替レート ボックス -->
       <a href="https://www.google.com/finance/beta/quote/TWD-JPY?sa=X&ved=2ahUKEwjW8OHNiKqWAxWnqFYBHUbqM74QmY0JegQIIBAm" target="_blank" class="hud-card">
         <div class="card-title label-rate">🪪 TWD / JPY</div>
         <div class="card-body">
@@ -376,6 +366,15 @@
         </div>
       </a>
 
+    </div>
+
+    <!-- 3. 下部：メンバーリスト（横一列フッターバー） -->
+    <div class="bottom-footer">
+      <span class="footer-label">MEMBERS</span>
+      <span class="footer-divider">|</span>
+      <div class="footer-members">
+        Dai <span>•</span> Katsumi <span>•</span> Masaki <span>•</span> Tanchi <span>•</span> Yohei
+      </div>
     </div>
 
   </div>
