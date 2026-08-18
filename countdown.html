@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HUD Dashboard - Balanced Layout</title>
+  <title>HUD Dashboard - Readable Layout</title>
   <style>
     :root {
       --c-taipei: #00d2d3;
@@ -168,7 +168,6 @@
       padding-top: 2px;
     }
 
-    /* 時刻と天気の統合レイアウト */
     .integrated-body {
       display: flex;
       justify-content: space-between;
@@ -219,7 +218,7 @@
       text-shadow: 0 1px 3px rgba(0,0,0,0.9);
     }
 
-    /* 為替レートエリア（情報量を増やして空白を解消） */
+    /* 為替エリア */
     .rate-container {
       display: flex;
       flex-direction: column;
@@ -250,18 +249,30 @@
       margin-left: 2px;
     }
 
-    /* パッと見で使える簡易換算リスト */
+    /* 縦2行の視認性重視レイアウト */
     .rate-calc-list {
       display: flex;
-      justify-content: space-between;
+      flex-direction: column;
+      gap: 1px;
       background: rgba(255, 255, 255, 0.06);
       border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 3px;
-      padding: 2px 4px;
-      margin-top: 3px;
+      border-radius: 4px;
+      padding: 3px 6px;
+      margin-top: 4px;
       font-size: 0.48rem;
       color: rgba(255, 255, 255, 0.85);
       font-weight: 600;
+    }
+
+    .calc-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .calc-row span {
+      color: var(--c-rate);
+      font-weight: 800;
     }
   </style>
 </head>
@@ -298,7 +309,7 @@
         </div>
       </a>
 
-      <!-- 2. 為替レート ボックス（空白埋め＋簡易換算追加） -->
+      <!-- 2. 為替レート ボックス -->
       <a href="https://www.google.com/finance/beta/quote/TWD-JPY?sa=X&ved=2ahUKEwjW8OHNiKqWAxWnqFYBHUbqM74QmY0JegQIIBAm" target="_blank" class="hud-card">
         <div class="card-title label-rate">🪪 TWD / JPY</div>
         <div class="card-body">
@@ -307,8 +318,8 @@
               <span class="rate-val" id="twd-rate">--.--</span><span class="rate-unit">円</span>
             </div>
             <div class="rate-calc-list">
-              <span>100元 ≒ <span id="calc-100">--</span>円</span>
-              <span>1000元 ≒ <span id="calc-1000">--</span>円</span>
+              <div class="calc-row">100元 <span>≒ <span id="calc-100">--</span>円</span></div>
+              <div class="calc-row">1000元 <span>≒ <span id="calc-1000">--</span>円</span></div>
             </div>
           </div>
         </div>
@@ -338,7 +349,6 @@
         if (data && data.rates && data.rates.JPY) {
           const rate = data.rates.JPY;
           document.getElementById('twd-rate').innerText = rate.toFixed(2);
-          // 簡易計算（100元 / 1000元）
           document.getElementById('calc-100').innerText = Math.round(rate * 100);
           document.getElementById('calc-1000').innerText = Math.round(rate * 1000).toLocaleString();
         }
