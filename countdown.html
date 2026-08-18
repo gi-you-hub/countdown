@@ -3,17 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HUD Dashboard - Members Integrated</title>
+  <title>HUD Dashboard - Taipei Edition</title>
   <style>
     :root {
-      --c-taipei: #00d2d3;
-      --c-cd: #ffa502;
-      --c-rate: #2ed573;
-      --c-member: #70a1ff; /* メンバー欄用（淡いブルー） */
+      /* カラーパレット */
+      --c-taipei: #00d2d3;  /* 台北用アクセント（シアン） */
+      --c-cd: #ffa502;      /* カウントダウン用（ゴールド） */
+      --c-rate: #2ed573;    /* 為替レート用（エメラルドグリーン） */
+      --c-member: #70a1ff;  /* メンバー用（ライトブルー） */
       
       --text-main: #ffffff;
       --text-sub: rgba(255, 255, 255, 0.8);
       
+      /* 枠線と背景 */
       --card-bg: rgba(10, 15, 25, 0.35);
       --card-bg-hover: rgba(20, 30, 50, 0.55);
       --card-border: rgba(255, 255, 255, 0.18);
@@ -33,6 +35,7 @@
       background-color: #000;
     }
 
+    /* 背景画像：高透過・固定1枚 */
     .dashboard-container {
       position: relative;
       width: 100%;
@@ -55,6 +58,7 @@
       pointer-events: none;
     }
 
+    /* 透過HUDカード */
     .hud-card {
       position: relative;
       z-index: 2;
@@ -79,6 +83,7 @@
       border-color: rgba(255, 255, 255, 0.35);
     }
 
+    /* 四隅のノッチ */
     .hud-card::after {
       content: '';
       position: absolute;
@@ -111,7 +116,7 @@
       text-shadow: 0 0 6px rgba(46, 213, 115, 0.6), 0 1px 3px rgba(0,0,0,0.9) !important; 
     }
 
-    /* 上部エリア（カウントダウン ＆ メンバー表示） */
+    /* 上部：カウントダウン(左) ＆ メンバー(右) */
     .top-section {
       display: flex;
       justify-content: space-between;
@@ -157,7 +162,7 @@
     .members-hud-tag {
       text-align: right;
       padding: 2px 4px;
-      max-width: 60%;
+      max-width: 65%;
     }
 
     .members-header {
@@ -327,7 +332,7 @@
 
       <!-- 右：参加メンバー -->
       <div class="members-hud-tag">
-        <div class="members-header">STUDENTS</div>
+        <div class="members-header">MEMBERS</div>
         <div class="members-list">
           Dai <span>•</span> Katsumi <span>•</span> Masaki <span>•</span> Tanchi <span>•</span> Yohei
         </div>
@@ -375,6 +380,7 @@
   </div>
 
   <script>
+    // 1. カウントダウン
     function updateCountdown() {
       const now = new Date();
       let targetYear = now.getFullYear();
@@ -387,6 +393,7 @@
       document.getElementById('cd-days').innerText = days;
     }
 
+    // 2. 為替レート (TWD -> JPY)
     async function fetchExchangeRate() {
       try {
         const res = await fetch('https://open.er-api.com/v6/latest/TWD');
@@ -402,6 +409,7 @@
       }
     }
 
+    // 3. 台北時間更新
     function updateClocks() {
       const now = new Date();
       const twFmt = new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Taipei', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
@@ -410,6 +418,7 @@
       document.getElementById('tw-sec').innerText = `:${twP.second}`;
     }
 
+    // 4. 台北天気予報
     function getWeatherEmoji(code) {
       if (code === 0) return '☀️';
       if (code >= 1 && code <= 3) return '⛅';
@@ -449,13 +458,15 @@
       }
     }
 
+    // 初回実行
     updateCountdown();
     updateClocks();
     fetchWeatherData();
     fetchExchangeRate();
 
+    // 定期更新
     setInterval(updateClocks, 1000);
-    setInterval(fetchExchangeRate, 3600000);
+    setInterval(fetchExchangeRate, 3600000); // 1時間ごと
   </script>
 </body>
 </html>
