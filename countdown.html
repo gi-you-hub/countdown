@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HUD Dashboard - School Trip Edition</title>
+  <title>HUD Dashboard - Dynamic Countdown Edition</title>
   <style>
     :root {
       /* カラーパレット */
@@ -113,7 +113,7 @@
     .label-rate { color: var(--c-rate) !important; text-shadow: 0 0 6px rgba(46, 213, 115, 0.5), 0 1px 3px rgba(0,0,0,0.9) !important; }
 
     /* ==========================================
-       1. 上部：COUNTDOWN（ダイレクト文字表示）
+       1. 上部：COUNTDOWN（リアルタイム・マルチディスプレイ）
        ========================================== */
     .top-bar {
       position: relative;
@@ -128,27 +128,39 @@
       letter-spacing: 1.2px;
       color: var(--c-cd);
       text-shadow: 0 0 8px rgba(255, 165, 2, 0.6), 0 1px 3px rgba(0,0,0,0.9);
-      margin-bottom: -2px;
+      margin-bottom: 1px;
       display: block;
     }
 
-    .cd-val {
-      font-size: 2rem;
-      font-weight: 900;
+    .cd-display {
+      display: flex;
+      align-items: baseline;
+      gap: 4px;
       color: var(--c-cd);
-      line-height: 1;
-      font-variant-numeric: tabular-nums;
       text-shadow: 0 0 10px rgba(255, 165, 2, 0.8), 0 2px 5px rgba(0,0,0,0.9);
     }
 
-    .cd-unit {
-      font-size: 0.48rem;
-      font-weight: 700;
-      color: rgba(255, 255, 255, 0.85);
-      letter-spacing: 1.2px;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.9);
-      margin-top: -1px;
-      display: block;
+    .cd-days-val {
+      font-size: 1.8rem;
+      font-weight: 900;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .cd-days-unit {
+      font-size: 0.65rem;
+      font-weight: 800;
+      margin-right: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .cd-hms-val {
+      font-size: 1.2rem;
+      font-weight: 800;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 1px;
+      opacity: 0.95;
     }
 
     /* ==========================================
@@ -343,11 +355,14 @@
 
   <div class="dashboard-container">
 
-    <!-- 1. 上部：COUNTDOWN -->
+    <!-- 1. 上部：COUNTDOWN (日・時・分・秒 リアルタイム表示) -->
     <div class="top-bar">
-      <span class="cd-label">COUNTDOWN</span>
-      <span class="cd-val" id="cd-days">--</span>
-      <span class="cd-unit">DAYS LEFT</span>
+      <span class="cd-label">COUNTDOWN TO TAIPEI</span>
+      <div class="cd-display">
+        <span class="cd-days-val" id="cd-days">--</span>
+        <span class="cd-days-unit">DAYS</span>
+        <span class="cd-hms-val" id="cd-hms">00:00:00</span>
+      </div>
     </div>
 
     <!-- 2. 下部グループ -->
@@ -409,19 +424,34 @@
   </div>
 
   <script>
-    // 1. カウントダウン（11月30日を正確に計算するロジック）
+    // 1. カウントダウン（リアルタイム・秒単位更新）
     function updateCountdown() {
       const now = new Date();
       let targetYear = now.getFullYear();
-      // 月は0スタート（0=1月、10=11月）のため、11月30日は (targetYear, 10, 30) と指定
+      // 目標日時：11月30日 11:45:00 (月は0始まりのため 10 = 11月)
       let target = new Date(targetYear, 10, 30, 11, 45, 0);
-      
+
       if (now > target) {
         target = new Date(targetYear + 1, 10, 30, 11, 45, 0);
       }
+
       const diff = target - now;
-      const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+
+      if (diff <= 0) {
+        document.getElementById('cd-days').innerText = '0';
+        document.getElementById('cd-hms').innerText = '00:00:00';
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+      const pad = (num) => String(num).padStart(2, '0');
+
       document.getElementById('cd-days').innerText = days;
+      document.getElementById('cd-hms').innerText = `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
     }
 
     // 2. 為替レート
@@ -440,7 +470,7 @@
       }
     }
 
-    // 3. 時計
+    // 3. 台北時刻
     function updateClocks() {
       const now = new Date();
       const twFmt = new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Taipei', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
@@ -489,12 +519,19 @@
       }
     }
 
+    // 初回実行
     updateCountdown();
     updateClocks();
     fetchWeatherData();
     fetchExchangeRate();
 
-    setInterval(updateClocks, 1000);
+    // 1秒ごとの高頻度更新（時計とカウントダウンの同期）
+    setInterval(() => {
+      updateCountdown();
+      updateClocks();
+    }, 1000);
+
+    // 為替は1時間ごと
     setInterval(fetchExchangeRate, 3600000);
   </script>
 </body>
