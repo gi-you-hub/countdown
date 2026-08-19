@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HUD Dashboard - High Transparency Edition</title>
+  <title>HUD Dashboard - School Trip Edition</title>
   <style>
     :root {
       /* カラーパレット */
@@ -15,7 +15,7 @@
       --text-main: #ffffff;
       --text-sub: rgba(255, 255, 255, 0.75);
       
-      /* 高透過ガラスモーフィズム（背景がより透き通る設定） */
+      /* 高透過ガラスモーフィズム */
       --card-bg: rgba(10, 15, 25, 0.22);
       --card-bg-hover: rgba(20, 30, 50, 0.45);
       --card-border: rgba(255, 255, 255, 0.12);
@@ -60,7 +60,7 @@
       pointer-events: none;
     }
 
-    /* 共通HUDカード（高透過ガラス） */
+    /* 共通HUDカード */
     .hud-card {
       position: relative;
       z-index: 2;
@@ -113,7 +113,7 @@
     .label-rate { color: var(--c-rate) !important; text-shadow: 0 0 6px rgba(46, 213, 115, 0.5), 0 1px 3px rgba(0,0,0,0.9) !important; }
 
     /* ==========================================
-       1. 上部：COUNTDOWN（枠なしダイレクト表示）
+       1. 上部：COUNTDOWN（ダイレクト文字表示）
        ========================================== */
     .top-bar {
       position: relative;
@@ -255,7 +255,6 @@
       margin-left: 2px;
     }
 
-    /* 1行ごとの簡易計算リスト */
     .rate-calc-container {
       display: flex;
       flex-direction: column;
@@ -344,17 +343,16 @@
 
   <div class="dashboard-container">
 
-    <!-- 1. 上部：COUNTDOWN (ダイレクト文字表示) -->
+    <!-- 1. 上部：COUNTDOWN -->
     <div class="top-bar">
       <span class="cd-label">COUNTDOWN</span>
       <span class="cd-val" id="cd-days">--</span>
       <span class="cd-unit">DAYS LEFT</span>
     </div>
 
-    <!-- 2. 下部グループ（メインカード＋フッター） -->
+    <!-- 2. 下部グループ -->
     <div class="bottom-group">
 
-      <!-- メイン情報（時刻・天気 ＆ 為替） -->
       <div class="main-grid">
 
         <!-- 左：時刻 & 天気 統合ボックス -->
@@ -411,10 +409,13 @@
   </div>
 
   <script>
+    // 1. カウントダウン（11月30日を正確に計算するロジック）
     function updateCountdown() {
       const now = new Date();
       let targetYear = now.getFullYear();
+      // 月は0スタート（0=1月、10=11月）のため、11月30日は (targetYear, 10, 30) と指定
       let target = new Date(targetYear, 10, 30, 11, 45, 0);
+      
       if (now > target) {
         target = new Date(targetYear + 1, 10, 30, 11, 45, 0);
       }
@@ -423,6 +424,7 @@
       document.getElementById('cd-days').innerText = days;
     }
 
+    // 2. 為替レート
     async function fetchExchangeRate() {
       try {
         const res = await fetch('https://open.er-api.com/v6/latest/TWD');
@@ -434,10 +436,11 @@
           document.getElementById('calc-1000').innerText = Math.round(rate * 1000).toLocaleString();
         }
       } catch (e) {
-        console.log('為替データ取得失敗');
+        console.log('為替データ取得スキップ');
       }
     }
 
+    // 3. 時計
     function updateClocks() {
       const now = new Date();
       const twFmt = new Intl.DateTimeFormat('ja-JP', { timeZone: 'Asia/Taipei', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
@@ -446,6 +449,7 @@
       document.getElementById('tw-sec').innerText = `:${twP.second}`;
     }
 
+    // 4. 天気予報
     function getWeatherEmoji(code) {
       if (code === 0) return '☀️';
       if (code >= 1 && code <= 3) return '⛅';
