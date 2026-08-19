@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HUD Dashboard - Refined Layout</title>
+  <title>HUD Dashboard - High Transparency Edition</title>
   <style>
     :root {
       /* カラーパレット */
@@ -13,14 +13,14 @@
       --c-member: #70a1ff;  /* メンバー用（ライトブルー） */
       
       --text-main: #ffffff;
-      --text-sub: rgba(255, 255, 255, 0.7);
+      --text-sub: rgba(255, 255, 255, 0.75);
       
-      /* ガラスモーフィズム */
-      --card-bg: rgba(10, 15, 25, 0.42);
-      --card-bg-hover: rgba(20, 30, 50, 0.6);
-      --card-border: rgba(255, 255, 255, 0.14);
+      /* 高透過ガラスモーフィズム（背景がより透き通る設定） */
+      --card-bg: rgba(10, 15, 25, 0.22);
+      --card-bg-hover: rgba(20, 30, 50, 0.45);
+      --card-border: rgba(255, 255, 255, 0.12);
       --inner-border: rgba(255, 255, 255, 0.08);
-      --glass-blur: 8px;
+      --glass-blur: 6px;
     }
 
     * {
@@ -55,12 +55,12 @@
       content: '';
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.5) 100%);
+      background: radial-gradient(circle at center, transparent 30%, rgba(0,0,0,0.4) 100%);
       z-index: 1;
       pointer-events: none;
     }
 
-    /* 共通HUDカード */
+    /* 共通HUDカード（高透過ガラス） */
     .hud-card {
       position: relative;
       z-index: 2;
@@ -77,13 +77,13 @@
       flex-direction: column;
       justify-content: space-between;
       transition: background 0.25s ease, border-color 0.25s ease;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
       cursor: pointer;
     }
 
     .hud-card:hover, .hud-card:active {
       background: var(--card-bg-hover);
-      border-color: rgba(255, 255, 255, 0.28);
+      border-color: rgba(255, 255, 255, 0.25);
     }
 
     .hud-card::after {
@@ -99,7 +99,7 @@
       font-size: 0.52rem;
       font-weight: 800;
       letter-spacing: 0.8px;
-      color: rgba(255, 255, 255, 0.65);
+      color: rgba(255, 255, 255, 0.75);
       margin-bottom: 4px;
       display: flex;
       justify-content: space-between;
@@ -109,26 +109,17 @@
       overflow: hidden;
     }
 
-    .label-taipei { color: var(--c-taipei) !important; text-shadow: 0 0 6px rgba(0, 210, 211, 0.4), 0 1px 3px rgba(0,0,0,0.9) !important; }
-    .label-rate { color: var(--c-rate) !important; text-shadow: 0 0 6px rgba(46, 213, 115, 0.4), 0 1px 3px rgba(0,0,0,0.9) !important; }
+    .label-taipei { color: var(--c-taipei) !important; text-shadow: 0 0 6px rgba(0, 210, 211, 0.5), 0 1px 3px rgba(0,0,0,0.9) !important; }
+    .label-rate { color: var(--c-rate) !important; text-shadow: 0 0 6px rgba(46, 213, 115, 0.5), 0 1px 3px rgba(0,0,0,0.9) !important; }
 
     /* ==========================================
-       1. 上部：COUNTDOWN（すっきりした左上配置）
+       1. 上部：COUNTDOWN（枠なしダイレクト表示）
        ========================================== */
     .top-bar {
       position: relative;
       z-index: 2;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      background: rgba(10, 15, 25, 0.45);
-      border: 1px solid rgba(255, 165, 2, 0.25);
-      backdrop-filter: blur(var(--glass-blur));
-      -webkit-backdrop-filter: blur(var(--glass-blur));
-      border-radius: 5px;
-      padding: 4px 10px;
-      width: fit-content;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      text-align: left;
+      padding: 2px 4px;
     }
 
     .cd-label {
@@ -136,23 +127,28 @@
       font-weight: 800;
       letter-spacing: 1.2px;
       color: var(--c-cd);
-      text-shadow: 0 0 8px rgba(255, 165, 2, 0.5);
+      text-shadow: 0 0 8px rgba(255, 165, 2, 0.6), 0 1px 3px rgba(0,0,0,0.9);
+      margin-bottom: -2px;
+      display: block;
     }
 
     .cd-val {
-      font-size: 1.15rem;
+      font-size: 2rem;
       font-weight: 900;
       color: var(--c-cd);
       line-height: 1;
       font-variant-numeric: tabular-nums;
-      text-shadow: 0 0 10px rgba(255, 165, 2, 0.7);
+      text-shadow: 0 0 10px rgba(255, 165, 2, 0.8), 0 2px 5px rgba(0,0,0,0.9);
     }
 
     .cd-unit {
       font-size: 0.48rem;
       font-weight: 700;
-      color: rgba(255, 255, 255, 0.75);
-      letter-spacing: 0.6px;
+      color: rgba(255, 255, 255, 0.85);
+      letter-spacing: 1.2px;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.9);
+      margin-top: -1px;
+      display: block;
     }
 
     /* ==========================================
@@ -196,13 +192,13 @@
       color: #ffffff;
       font-variant-numeric: tabular-nums;
       line-height: 1;
-      text-shadow: 0 0 8px rgba(255, 255, 255, 0.5), 0 2px 4px rgba(0, 0, 0, 0.9);
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.6), 0 2px 4px rgba(0, 0, 0, 0.9);
       white-space: nowrap;
     }
 
     .time-sec {
       font-size: 0.65rem;
-      color: rgba(255, 255, 255, 0.65);
+      color: rgba(255, 255, 255, 0.7);
       font-weight: 600;
     }
 
@@ -217,18 +213,18 @@
     .weather-day {
       text-align: center;
       flex: 1;
-      background: rgba(255, 255, 255, 0.04);
+      background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--inner-border);
       padding: 3px 1px;
       border-radius: 4px;
       min-width: 0;
     }
 
-    .weather-date { font-size: 0.48rem; color: var(--text-sub); font-weight: 600; }
-    .weather-icon { font-size: 0.8rem; margin: 1px 0; filter: drop-shadow(0 0 2px rgba(0,0,0,0.8)); }
-    .weather-temp { font-size: 0.55rem; font-weight: 800; color: #ffffff; }
+    .weather-date { font-size: 0.48rem; color: var(--text-sub); font-weight: 600; text-shadow: 0 1px 2px rgba(0,0,0,0.9); }
+    .weather-icon { font-size: 0.8rem; margin: 1px 0; filter: drop-shadow(0 0 3px rgba(0,0,0,0.9)); }
+    .weather-temp { font-size: 0.55rem; font-weight: 800; color: #ffffff; text-shadow: 0 1px 3px rgba(0,0,0,0.9); }
 
-    /* 為替エリア（並び順と直感性を改善） */
+    /* 為替エリア */
     .rate-container {
       display: flex;
       flex-direction: column;
@@ -248,18 +244,18 @@
       color: var(--c-rate);
       line-height: 1;
       font-variant-numeric: tabular-nums;
-      text-shadow: 0 0 8px rgba(46, 213, 115, 0.5);
+      text-shadow: 0 0 8px rgba(46, 213, 115, 0.6), 0 2px 4px rgba(0,0,0,0.9);
       white-space: nowrap;
     }
 
     .rate-unit {
       font-size: 0.6rem;
       font-weight: 700;
-      color: rgba(255, 255, 255, 0.75);
+      color: rgba(255, 255, 255, 0.8);
       margin-left: 2px;
     }
 
-    /* 読みやすい1行ごとの簡易計算リスト */
+    /* 1行ごとの簡易計算リスト */
     .rate-calc-container {
       display: flex;
       flex-direction: column;
@@ -278,6 +274,7 @@
       font-size: 0.46rem;
       color: rgba(255, 255, 255, 0.85);
       font-weight: 600;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.9);
     }
 
     .rate-calc-row span:last-child {
@@ -292,7 +289,7 @@
       display: flex;
       align-items: center;
       gap: 8px;
-      background: rgba(10, 15, 25, 0.4);
+      background: var(--card-bg);
       border: 1px solid rgba(112, 161, 255, 0.18);
       backdrop-filter: blur(var(--glass-blur));
       -webkit-backdrop-filter: blur(var(--glass-blur));
@@ -308,7 +305,7 @@
       font-weight: 800;
       letter-spacing: 1px;
       color: var(--c-member);
-      text-shadow: 0 0 6px rgba(112, 161, 255, 0.5);
+      text-shadow: 0 0 6px rgba(112, 161, 255, 0.5), 0 1px 3px rgba(0,0,0,0.9);
       white-space: nowrap;
       display: flex;
       align-items: center;
@@ -330,6 +327,7 @@
       font-weight: 600;
       color: rgba(255, 255, 255, 0.85);
       letter-spacing: 0.4px;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.9);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -346,14 +344,14 @@
 
   <div class="dashboard-container">
 
-    <!-- 1. 上部：COUNTDOWN -->
+    <!-- 1. 上部：COUNTDOWN (ダイレクト文字表示) -->
     <div class="top-bar">
       <span class="cd-label">COUNTDOWN</span>
       <span class="cd-val" id="cd-days">--</span>
       <span class="cd-unit">DAYS LEFT</span>
     </div>
 
-    <!-- 2. 下部グループ（メインカード＋フッターを下側にまとめる） -->
+    <!-- 2. 下部グループ（メインカード＋フッター） -->
     <div class="bottom-group">
 
       <!-- メイン情報（時刻・天気 ＆ 為替） -->
